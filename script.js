@@ -81,19 +81,27 @@ const words = {
   }
 };
 
-// Display all words by category and difficulty
-const container = document.getElementById("word-container");
+// Function to display words based on selected category and difficulty
+function displayWords() {
+  const category = document.getElementById("categoryDropdown").value;
+  const difficulty = document.getElementById("difficultyDropdown").value;
+  const wordList = words[category] && words[category][difficulty];
 
-// Loop through categories and difficulties
-for (const category in words) {
-  for (const level in words[category]) {
-    const title = `${category.toUpperCase()} - ${level.toUpperCase()}`;
-    const wordList = words[category][level].join(", ");
+  const wordContainer = document.getElementById("wordContainer");
+  wordContainer.innerHTML = ""; // Clear previous content
 
-    // Create a div for each set
-    const div = document.createElement("div");
-    div.style.marginBottom = "20px"; // spacing between categories
-    div.innerHTML = `<strong>${title}:</strong> ${wordList}`;
-    container.appendChild(div);
+  if (wordList) {
+    const list = document.createElement("ul");
+    wordList.forEach(word => {
+      const listItem = document.createElement("li");
+      listItem.textContent = word;
+      list.appendChild(listItem);
+    });
+    wordContainer.appendChild(list);
+  } else {
+    wordContainer.textContent = "No words available for the selected category and difficulty.";
   }
 }
+
+// Add event listener to the "Show Words" button
+document.getElementById("showWordsButton").addEventListener("click", displayWords);
