@@ -81,6 +81,14 @@ const words = {
   }
 };
 
-// Example: Show all kid mammals
 const container = document.getElementById("word-container");
-container.innerHTML = words.mammals.kid.join(", ");
+const categorySelect = document.getElementById("category");
+const difficultySelect = document.getElementById("difficulty");
+const showButton = document.getElementById("show-words");
+
+showButton.addEventListener("click", () => {
+  const category = categorySelect.value;
+  const difficulty = difficultySelect.value;
+  const wordList = words[category][difficulty];
+  container.innerHTML = wordList.join(", ");
+});
