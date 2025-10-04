@@ -7,7 +7,28 @@
 </head>
 <body>
   <h1>Animal Word Game</h1>
+
+  <label for="category">Choose a category:</label>
+  <select id="category">
+    <option value="mammals">Mammals</option>
+    <option value="birds">Birds</option>
+    <option value="reptiles">Reptiles</option>
+    <option value="amphibians">Amphibians</option>
+    <option value="fish">Fish</option>
+    <option value="insects">Insects</option>
+    <option value="invertebrates">Invertebrates</option>
+  </select>
+
+  <label for="difficulty">Choose difficulty:</label>
+  <select id="difficulty">
+    <option value="kid">Kid</option>
+    <option value="adult">Adult</option>
+  </select>
+
+  <button id="show-words">Show Words</button>
+
   <div id="word-container"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
