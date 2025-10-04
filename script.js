@@ -1,4 +1,4 @@
-// Organized word list for your Word Search Project
+// Full 200-word list organized by category and difficulty
 const words = {
   mammals: {
     kid: [
@@ -35,7 +35,7 @@ const words = {
     adult: [
       "Anaconda","Basilisk lizard","Boa constrictor","Gila monster",
       "Horned lizard","Monitor lizard","Rattlesnake","Sea snake","Tuatara",
-      "Komodo dragon" // listed twice intentionally (kid + adult recognition)
+      "Komodo dragon"
     ]
   },
   amphibians: {
@@ -81,14 +81,19 @@ const words = {
   }
 };
 
+// Display all words by category and difficulty
 const container = document.getElementById("word-container");
-const categorySelect = document.getElementById("category");
-const difficultySelect = document.getElementById("difficulty");
-const showButton = document.getElementById("show-words");
 
-showButton.addEventListener("click", () => {
-  const category = categorySelect.value;
-  const difficulty = difficultySelect.value;
-  const wordList = words[category][difficulty];
-  container.innerHTML = wordList.join(", ");
-});
+// Loop through categories and difficulties
+for (const category in words) {
+  for (const level in words[category]) {
+    const title = `${category.toUpperCase()} - ${level.toUpperCase()}`;
+    const wordList = words[category][level].join(", ");
+
+    // Create a div for each set
+    const div = document.createElement("div");
+    div.style.marginBottom = "20px"; // spacing between categories
+    div.innerHTML = `<strong>${title}:</strong> ${wordList}`;
+    container.appendChild(div);
+  }
+}
