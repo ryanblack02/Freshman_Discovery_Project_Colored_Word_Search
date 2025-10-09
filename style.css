@@ -10,3 +10,17 @@ body {
   font-size: 18px;
   font-weight: bold;
 }
+
+.grid-table {
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.grid-table td {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  border: 1px solid #555;
+  font-family: monospace;
+  font-size: 18px;
+}
