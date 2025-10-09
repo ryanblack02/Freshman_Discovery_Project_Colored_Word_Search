@@ -105,3 +105,70 @@ function displayWords() {
 
 // Add event listener to the "Show Words" button
 document.getElementById("showWordsButton").addEventListener("click", displayWords);
+
+const gridSize = 12;
+
+function createEmptyGrid() {
+  return Array.from({ length: gridSize }, () => Array(gridSize).fill(""));
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+function placeWord(grid, word) {
+  const directions = ["right", "down"];
+  const direction = directions[Math.floor(Math.random() * directions.length)];
+
+  for (let attempt = 0; attempt < 100; attempt++) {
+    let row = getRandomInt(gridSize);
+    let col = getRandomInt(gridSize);
+
+    if (direction === "right") {
+      if (col + word.length > gridSize) continue;
+      if (grid[row].slice(col, col + word.length).some(cell => cell !== "")) continue;
+      for (let i = 0; i < word.length; i++) grid[row][col + i] = word[i];
+      return true;
+    }
+
+    if (direction === "down") {
+      if (row + word.length > gridSize) continue;
+      if (grid.slice(row, row + word.length).some(r => r[col] !== "")) continue;
+      for (let i = 0; i < word.length; i++) grid[row + i][col] = word[i];
+      return true;
+    }
+  }
+  return false;
+}
+
+function displayGrid(grid) {
+  const gridContainer = document.getElementById("grid");
+  gridContainer.innerHTML = "";
+
+  const table = document.createElement("table");
+  table.classList.add("grid-table");
+
+  grid.forEach(row => {
+    const tr = document.createElement("tr");
+    row.forEach(cell => {
+      const td = document.createElement("td");
+      td.textContent = cell === "" ? "" : cell.toUpperCase();
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+
+  gridContainer.appendChild(table);
+}
+
+function generateGrid() {
+  const category = document.getElementById("category").value;
+  const selectedWords = words[category];
+  const numberOfWords = Math.min(getRandomInt(4) + 5, selectedWords.length);
+  const chosenWords = selectedWords.sort(() => 0.5 - Math.random()).slice(0, numberOfWords);
+
+  const grid = createEmptyGrid();
+  chosenWords.forEach(word => placeWord(grid, word));
+  displayGrid(grid);
+
+  document.getElementById("wordList").textContent = "Words: " + chosenWords.join(", ");
