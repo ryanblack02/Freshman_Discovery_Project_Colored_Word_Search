@@ -9,9 +9,9 @@ const words = {
     ],
     adult: [
       "Aardvark","Aardwolf","Alpaca","Antelope","Bison","Capybara","Chimpanzee",
-      "Cheetah","Dugong","Echidna","Fennec fox","Gerenuk","Hartebeest","Hyena",
+      "Cheetah","Dugong","Echidna","Fennecfox","Gerenuk","Hartebeest","Hyena",
       "Impala","Jackal","Koala","Lemur","Manatee","Meerkat","Moose","Narwhal",
-      "Okapi","Platypus","Porcupine","Red panda","Sloth","Tapir","Warthog",
+      "Okapi","Platypus","Porcupine","Redpanda","Sloth","Tapir","Warthog",
       "Wolverine"
     ]
   },
@@ -28,60 +28,28 @@ const words = {
     ]
   },
   reptiles: {
-    kid: [
-      "Snake","Lizard","Crocodile","Alligator","Turtle","Tortoise","Chameleon",
-      "Gecko","Iguana","Komodo dragon"
-    ],
-    adult: [
-      "Anaconda","Basilisk lizard","Boa constrictor","Gila monster",
-      "Horned lizard","Monitor lizard","Rattlesnake","Sea snake","Tuatara",
-      "Komodo dragon"
-    ]
+    kid: ["Snake","Lizard","Crocodile","Alligator","Turtle","Tortoise","Chameleon","Gecko","Iguana","Komododragon"],
+    adult: ["Anaconda","Basilisk","Boa","Gila","Monitor","Rattlesnake","Tuatara","Komododragon"]
   },
   amphibians: {
-    kid: [
-      "Frog","Toad","Salamander","Newt","Axolotl"
-    ],
-    adult: [
-      "Cane toad","Glass frog","Fire-bellied toad","Olm","Surinam toad"
-    ]
+    kid: ["Frog","Toad","Salamander","Newt","Axolotl"],
+    adult: ["Canetoad","Glassfrog","Firebelliedtoad","Olm","Surinamtoad"]
   },
   fish: {
-    kid: [
-      "Goldfish","Salmon","Tuna","Shark","Clownfish","Trout","Seahorse",
-      "Catfish","Angelfish","Swordfish"
-    ],
-    adult: [
-      "Anglerfish","Barracuda","Betta fish","Carp","Catfish","Eel","Grouper",
-      "Guppy","Lionfish","Mahi-mahi","Marlin","Moray eel","Piranha","Sturgeon",
-      "Wobbegong"
-    ]
+    kid: ["Goldfish","Salmon","Tuna","Shark","Clownfish","Trout","Seahorse","Catfish","Angelfish","Swordfish"],
+    adult: ["Anglerfish","Barracuda","Betta","Carp","Eel","Grouper","Guppy","Lionfish","Mahi","Marlin","Piranha"]
   },
   insects: {
-    kid: [
-      "Butterfly","Bee","Ant","Ladybug","Grasshopper","Dragonfly","Mosquito",
-      "Fly","Wasp","Beetle","Moth","Caterpillar","Cockroach","Cricket",
-      "Firefly"
-    ],
-    adult: [
-      "Atlas moth","Cicada","Damselfly","Goliath beetle","Hercules beetle",
-      "Lanternfly","Leafcutter ant","Praying mantis","Scorpion","Tarantula",
-      "Water strider","Weaver ant","Walking stick","Woodlouse","Whip scorpion"
-    ]
+    kid: ["Butterfly","Bee","Ant","Ladybug","Grasshopper","Dragonfly","Mosquito","Fly","Wasp","Beetle","Moth","Cricket"],
+    adult: ["Atlasmoth","Cicada","Damselfly","Goliathbeetle","Mantis","Scorpion","Tarantula","Walkingstick"]
   },
   invertebrates: {
-    kid: [
-      "Crab","Lobster","Shrimp","Jellyfish","Starfish","Octopus","Squid",
-      "Clam","Snail","Spider"
-    ],
-    adult: [
-      "Horseshoe crab","Lanternfish","Mantis shrimp","Nudibranch","Pangolin",
-      "Sea cucumber","Sea lion","Sea otter","Walrus","Yabby"
-    ]
+    kid: ["Crab","Lobster","Shrimp","Jellyfish","Starfish","Octopus","Squid","Clam","Snail","Spider"],
+    adult: ["Horseshoecrab","Mantis","Nudibranch","Sealion","Walrus","Yabby"]
   }
 };
 
-// Function to display words based on selected category and difficulty
+// Show words for testing (Week 3 feature)
 function displayWords() {
   const category = document.getElementById("categoryDropdown").value;
   const difficulty = document.getElementById("difficultyDropdown").value;
@@ -102,10 +70,11 @@ function displayWords() {
     wordContainer.textContent = "No words available for the selected category and difficulty.";
   }
 }
-
-// Add event listener to the "Show Words" button
 document.getElementById("showWordsButton").addEventListener("click", displayWords);
 
+// -------------------------
+// WEEK 4 GRID GENERATOR
+// -------------------------
 const gridSize = 12;
 
 function createEmptyGrid() {
@@ -162,13 +131,17 @@ function displayGrid(grid) {
 }
 
 function generateGrid() {
-  const category = document.getElementById("category").value;
-  const selectedWords = words[category];
-  const numberOfWords = Math.min(getRandomInt(4) + 5, selectedWords.length);
+  const category = document.getElementById("categoryDropdown").value;
+  const difficulty = document.getElementById("difficultyDropdown").value;
+  const selectedWords = words[category][difficulty];
+  if (!selectedWords) return;
+
+  const numberOfWords = Math.min(5 + getRandomInt(4), selectedWords.length);
   const chosenWords = selectedWords.sort(() => 0.5 - Math.random()).slice(0, numberOfWords);
 
   const grid = createEmptyGrid();
-  chosenWords.forEach(word => placeWord(grid, word));
+  chosenWords.forEach(word => placeWord(grid, word.toUpperCase()));
   displayGrid(grid);
 
   document.getElementById("wordList").textContent = "Words: " + chosenWords.join(", ");
+}
