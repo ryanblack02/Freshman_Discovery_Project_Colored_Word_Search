@@ -144,4 +144,6 @@ function generateGrid() {
   displayGrid(grid);
 
   document.getElementById("wordList").textContent = "Words: " + chosenWords.join(", ");
+  document.getElementById("generateGridButton").addEventListener("click", generateGrid);
+
 }
