@@ -2,41 +2,126 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Word Game Project</title>
+  <title>Animal Word Search</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* --- BASIC PAGE LAYOUT --- */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f8fc;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #2b4a75;
+      margin-bottom: 20px;
+    }
+
+    /* --- DROPDOWNS AND BUTTONS --- */
+    select, button {
+      margin: 5px;
+      padding: 8px 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    button {
+      background-color: #2b4a75;
+      color: white;
+    }
+
+    button:hover {
+      background-color: #3d5f99;
+    }
+
+    /* --- GRID STYLING --- */
+    #grid {
+      margin: 20px auto;
+      display: inline-block;
+    }
+
+    .grid-table {
+      border-collapse: collapse;
+    }
+
+    .grid-table td {
+      width: 35px;
+      height: 35px;
+      border: 1px solid #333;
+      text-align: center;
+      vertical-align: middle;
+      font-family: monospace;
+      font-size: 18px;
+      background-color: white;
+      color: #222;
+    }
+
+    /* --- WORD LIST & WORD CONTAINER --- */
+    #wordList {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #333;
+    }
+
+    #wordContainer {
+      margin-top: 20px;
+      text-align: left;
+      display: inline-block;
+    }
+
+    #wordContainer ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #wordContainer li {
+      padding: 3px 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>Animal Word Game</h1>
+  <h1>Animal Word Search Game</h1>
 
-  <!-- Dropdown for selecting category -->
-<select id="categoryDropdown">
-  <option value="mammals">Mammals</option>
-  <option value="birds">Birds</option>
-  <option value="reptiles">Reptiles</option>
-  <option value="amphibians">Amphibians</option>
-  <option value="fish">Fish</option>
-  <option value="insects">Insects</option>
-  <option value="invertebrates">Invertebrates</option>
-</select>
+  <!-- Dropdowns for category and difficulty -->
+  <div>
+    <label for="categoryDropdown">Choose a category:</label>
+    <select id="categoryDropdown">
+      <option value="mammals">Mammals</option>
+      <option value="birds">Birds</option>
+      <option value="reptiles">Reptiles</option>
+      <option value="amphibians">Amphibians</option>
+      <option value="fish">Fish</option>
+      <option value="insects">Insects</option>
+      <option value="invertebrates">Invertebrates</option>
+    </select>
 
-<!-- Dropdown for selecting difficulty -->
-<select id="difficultyDropdown">
-  <option value="kid">Kid</option>
-  <option value="adult">Adult</option>
-</select>
+    <label for="difficultyDropdown">Difficulty:</label>
+    <select id="difficultyDropdown">
+      <option value="kid">Kid</option>
+      <option value="adult">Adult</option>
+    </select>
+  </div>
 
-<button onclick="generateGrid()">Generate Grid</button>
-<div id="wordList"></div>
-<div id="grid"></div>
+  <!-- Action buttons -->
+  <div>
+    <button id="generateGridButton">Generate Grid</button>
+    <button id="showWordsButton">Show Words</button>
+  </div>
 
+  <!-- Display the word list used in the grid -->
+  <div id="wordList"></div>
 
-<!-- Button to show words -->
-<button id="showWordsButton">Show Words</button>
+  <!-- Word search grid -->
+  <div id="grid"></div>
 
-<!-- Container to display words -->
-<div id="wordContainer"></div>
+  <!-- Optional full word list display -->
+  <div id="wordContainer"></div>
 
-
+  <!-- Link JS file -->
   <script src="script.js"></script>
 </body>
 </html>
