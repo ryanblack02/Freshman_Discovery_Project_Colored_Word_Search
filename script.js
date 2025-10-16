@@ -75,61 +75,59 @@ document.getElementById("showWordsButton").addEventListener("click", displayWord
 // -------------------------
 // WEEK 4 GRID GENERATOR
 // -------------------------
+// --- Grid Settings ---
 const gridSize = 12;
+
+// --- Utility Functions ---
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
 
 function createEmptyGrid() {
   return Array.from({ length: gridSize }, () => Array(gridSize).fill(""));
 }
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
+// --- Place Words (Right or Down Only) ---
+function placeWord(grid, word) {
+  const direction = Math.random() < 0.5 ? "right" : "down";
+  const len = word.length;
+
+  let row, col;
+  let fits = false;
+
+  while (!fits) {
+    row = getRandomInt(gridSize);
+    col = getRandomInt(gridSize);
+
+    if (direction === "right" && col + len <= gridSize) fits = true;
+    else if (direction === "down" && row + len <= gridSize) fits = true;
+  }
+
+  for (let i = 0; i < len; i++) {
+    if (direction === "right") grid[row][col + i] = word[i];
+    else grid[row + i][col] = word[i];
+  }
 }
 
-function placeWord(grid, word) {
-  const directions = ["right", "down"];
-  const direction = directions[Math.floor(Math.random() * directions.length)];
+// --- Display Grid in HTML ---
+function displayGrid(grid) {
+  const gridDiv = document.getElementById("grid");
+  gridDiv.innerHTML = "";
+  gridDiv.style.display = "grid";
+  gridDiv.style.gridTemplateColumns = `repeat(${gridSize}, 30px)`;
+  gridDiv.style.gap = "2px";
 
-  for (let attempt = 0; attempt < 100; attempt++) {
-    let row = getRandomInt(gridSize);
-    let col = getRandomInt(gridSize);
-
-    if (direction === "right") {
-      if (col + word.length > gridSize) continue;
-      if (grid[row].slice(col, col + word.length).some(cell => cell !== "")) continue;
-      for (let i = 0; i < word.length; i++) grid[row][col + i] = word[i];
-      return true;
-    }
-
-    if (direction === "down") {
-      if (row + word.length > gridSize) continue;
-      if (grid.slice(row, row + word.length).some(r => r[col] !== "")) continue;
-      for (let i = 0; i < word.length; i++) grid[row + i][col] = word[i];
-      return true;
+  for (let row of grid) {
+    for (let cell of row) {
+      const div = document.createElement("div");
+      div.className = "cell";
+      div.textContent = cell || "";
+      gridDiv.appendChild(div);
     }
   }
-  return false;
 }
 
-function displayGrid(grid) {
-  const gridContainer = document.getElementById("grid");
-  gridContainer.innerHTML = "";
-
-  const table = document.createElement("table");
-  table.classList.add("grid-table");
-
-  grid.forEach(row => {
-    const tr = document.createElement("tr");
-    row.forEach(cell => {
-      const td = document.createElement("td");
-      td.textContent = cell === "" ? "" : cell.toUpperCase();
-      tr.appendChild(td);
-    });
-    table.appendChild(tr);
-  });
-
-  gridContainer.appendChild(table);
-}
-
+// --- Main Function to Generate Grid ---
 function generateGrid() {
   const category = document.getElementById("categoryDropdown").value;
   const difficulty = document.getElementById("difficultyDropdown").value;
@@ -143,7 +141,11 @@ function generateGrid() {
   chosenWords.forEach(word => placeWord(grid, word.toUpperCase()));
   displayGrid(grid);
 
-  document.getElementById("wordList").textContent = "Words: " + chosenWords.join(", ");
-  document.getElementById("generateGridButton").addEventListener("click", generateGrid);
-
+  document.getElementById("wordList").textContent =
+    "Words: " + chosenWords.join(", ");
 }
+
+// ✅ Attach Event Listener Once
+document
+  .querySelector("button[onclick='generateGrid()']")
+  .addEventListener("click", generateGrid);
