@@ -72,9 +72,6 @@ function displayWords() {
 }
 document.getElementById("showWordsButton").addEventListener("click", displayWords);
 
-// -------------------------
-// WEEK 4 GRID GENERATOR
-// -------------------------
 // --- Grid Settings ---
 const gridSize = 12;
 
