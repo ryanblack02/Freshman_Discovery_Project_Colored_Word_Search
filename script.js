@@ -144,6 +144,8 @@ function generateGrid() {
 
 // ✅ Attach Event Listener Once
 document
-  .getElementById("generateGridButton")
+  document
+  .querySelector("button[onclick='generateGrid()']")
   .addEventListener("click", generateGrid);
+
 
