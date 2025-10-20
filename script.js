@@ -1,11 +1,23 @@
+// --- Full Word List Organized by Category & Difficulty ---
 const words = {
   mammals: {
-    kid: ["Dog","Cat","Cow","Horse","Pig","Sheep","Goat","Rabbit","Lion","Tiger","Elephant","Bear","Monkey","Giraffe","Kangaroo","Panda","Zebra","Deer","Fox","Wolf","Dolphin","Whale","Seal","Otter","Squirrel","Mouse","Rat","Hedgehog","Bat","Raccoon"],
-    adult: ["Aardvark","Aardwolf","Alpaca","Antelope","Bison","Capybara","Chimpanzee","Cheetah","Dugong","Echidna","Fennec fox","Gerenuk","Hartebeest","Hyena","Impala","Jackal","Koala","Lemur","Manatee","Meerkat","Moose","Narwhal","Okapi","Platypus","Porcupine","Red panda","Sloth","Tapir","Warthog","Wolverine"]
+    kid: ["Dog","Cat","Cow","Horse","Pig","Sheep","Goat","Rabbit","Lion","Tiger",
+      "Elephant","Bear","Monkey","Giraffe","Kangaroo","Panda","Zebra","Deer",
+      "Fox","Wolf","Dolphin","Whale","Seal","Otter","Squirrel","Mouse","Rat",
+      "Hedgehog","Bat","Raccoon"],
+    adult: ["Aardvark","Aardwolf","Alpaca","Antelope","Bison","Capybara","Chimpanzee",
+      "Cheetah","Dugong","Echidna","Fennec fox","Gerenuk","Hartebeest","Hyena",
+      "Impala","Jackal","Koala","Lemur","Manatee","Meerkat","Moose","Narwhal",
+      "Okapi","Platypus","Porcupine","Red panda","Sloth","Tapir","Warthog",
+      "Wolverine"]
   },
   birds: {
-    kid: ["Chicken","Duck","Goose","Swan","Owl","Eagle","Hawk","Parrot","Penguin","Flamingo","Peacock","Crow","Sparrow","Robin","Hummingbird","Toucan","Woodpecker","Seagull","Pelican","Ostrich"],
-    adult: ["Albatross","Cassowary","Cockatoo","Condor","Crane","Falcon","Heron","Hornbill","Kingfisher","Kookaburra","Macaw","Nightingale","Quail","Roadrunner","Shoebill"]
+    kid: ["Chicken","Duck","Goose","Swan","Owl","Eagle","Hawk","Parrot","Penguin",
+      "Flamingo","Peacock","Crow","Sparrow","Robin","Hummingbird","Toucan",
+      "Woodpecker","Seagull","Pelican","Ostrich"],
+    adult: ["Albatross","Cassowary","Cockatoo","Condor","Crane","Falcon","Heron",
+      "Hornbill","Kingfisher","Kookaburra","Macaw","Nightingale","Quail",
+      "Roadrunner","Shoebill"]
   },
   reptiles: {
     kid: ["Snake","Lizard","Crocodile","Alligator","Turtle","Tortoise","Chameleon","Gecko","Iguana","Komodo dragon"],
@@ -31,6 +43,7 @@ const words = {
 
 const gridSize = 12;
 
+// --- Utility Functions ---
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
@@ -52,8 +65,11 @@ function placeWord(grid, word) {
   const direction = Math.random() < 0.5 ? "right" : "down";
   const len = word.length;
   let placed = false;
+  let attempts = 0;
+  const maxAttempts = 50; // Prevent infinite loop
 
-  while (!placed) {
+  while (!placed && attempts < maxAttempts) {
+    attempts++;
     const row = getRandomInt(gridSize);
     const col = getRandomInt(gridSize);
 
@@ -65,26 +81,27 @@ function placeWord(grid, word) {
       placed = true;
     }
   }
+  if (!placed) console.warn(`Could not place word: ${word}`);
 }
 
 function displayGrid(grid) {
   const gridDiv = document.getElementById("grid");
-  gridDiv.innerHTML = "";
-
+  let html = '';
   grid.forEach(row => {
     row.forEach(letter => {
-      const div = document.createElement("div");
-      div.className = "cell";
-      div.textContent = letter;
-      gridDiv.appendChild(div);
+      html += `<div class="cell">${letter}</div>`;
     });
   });
+  gridDiv.innerHTML = html;
 }
 
 function generateWordSearch() {
   const category = document.getElementById("categoryDropdown").value;
   const difficulty = document.getElementById("difficultyDropdown").value;
-  const selectedWords = words[category][difficulty];
+  let selectedWords = words[category][difficulty];
+
+  // Filter words longer than grid
+  selectedWords = selectedWords.filter(word => word.length <= gridSize);
 
   const grid = createEmptyGrid();
   const numberOfWords = Math.min(6, selectedWords.length);
@@ -101,8 +118,8 @@ function generateWordSearch() {
     `Category: ${category.charAt(0).toUpperCase() + category.slice(1)} – Difficulty: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`;
 }
 
-// Attach the button event
+// Attach button event
 document.getElementById("generateButton").addEventListener("click", generateWordSearch);
 
-// Generate first grid on page load
+// Generate initial grid on page load
 window.onload = generateWordSearch;
