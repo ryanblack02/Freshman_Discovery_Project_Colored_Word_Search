@@ -8,8 +8,8 @@
 <body>
   <h1>Animal Word Search</h1>
 
-  <!-- Category & Difficulty Selection -->
-  <div id="controls">
+  <!-- Category & Difficulty Dropdowns -->
+  <div>
     <label for="categoryDropdown">Category:</label>
     <select id="categoryDropdown">
       <option value="mammals">Mammals</option>
@@ -26,12 +26,15 @@
       <option value="kid">Kid</option>
       <option value="adult">Adult</option>
     </select>
+  </div>
 
+  <!-- Generate Button -->
+  <div>
     <button id="generateButton">Generate Word Search</button>
   </div>
 
-  <!-- Display selected category/difficulty -->
-  <h2 id="categoryLabel"></h2>
+  <!-- Display category & difficulty -->
+  <div id="categoryLabel"></div>
 
   <!-- Grid -->
   <div id="grid"></div>
