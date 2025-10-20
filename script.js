@@ -62,37 +62,56 @@ function fillEmptySpaces(grid) {
 }
 
 function placeWord(grid, word) {
-  const direction = Math.random() < 0.5 ? "right" : "down";
+  const directions = [
+    "right", "left", "down", "up",
+    "diagDownRight", "diagDownLeft", "diagUpRight", "diagUpLeft"
+  ];
+
   const len = word.length;
   let placed = false;
   let attempts = 0;
-  const maxAttempts = 50; // Prevent infinite loop
+  const maxAttempts = 100; // Prevent infinite loops
 
   while (!placed && attempts < maxAttempts) {
     attempts++;
+    const direction = directions[getRandomInt(directions.length)];
     const row = getRandomInt(gridSize);
     const col = getRandomInt(gridSize);
 
-    if (direction === "right" && col + len <= gridSize) {
-      for (let i = 0; i < len; i++) grid[row][col + i] = word[i];
-      placed = true;
-    } else if (direction === "down" && row + len <= gridSize) {
-      for (let i = 0; i < len; i++) grid[row + i][col] = word[i];
+    let fits = true;
+    let positions = [];
+
+    // Compute positions based on direction
+    for (let i = 0; i < len; i++) {
+      let r = row, c = col;
+
+      switch (direction) {
+        case "right": c += i; break;
+        case "left": c -= i; break;
+        case "down": r += i; break;
+        case "up": r -= i; break;
+        case "diagDownRight": r += i; c += i; break;
+        case "diagDownLeft": r += i; c -= i; break;
+        case "diagUpRight": r -= i; c += i; break;
+        case "diagUpLeft": r -= i; c -= i; break;
+      }
+
+      // Check boundaries
+      if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) {
+        fits = false;
+        break;
+      }
+      positions.push([r, c]);
+    }
+
+    if (fits) {
+      // Place the word
+      positions.forEach(([r, c], i) => grid[r][c] = word[i]);
       placed = true;
     }
   }
-  if (!placed) console.warn(`Could not place word: ${word}`);
-}
 
-function displayGrid(grid) {
-  const gridDiv = document.getElementById("grid");
-  let html = '';
-  grid.forEach(row => {
-    row.forEach(letter => {
-      html += `<div class="cell">${letter}</div>`;
-    });
-  });
-  gridDiv.innerHTML = html;
+  if (!placed) console.warn(`Could not place word: ${word}`);
 }
 
 function generateWordSearch() {
