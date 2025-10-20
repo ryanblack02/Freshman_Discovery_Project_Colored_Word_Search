@@ -1,14 +1,12 @@
-// Full 200-word list organized by category and difficulty
+// --- Full Word List Organized by Category & Difficulty ---
 const words = {
   mammals: {
-    kid: [
-      "Dog","Cat","Cow","Horse","Pig","Sheep","Goat","Rabbit","Lion","Tiger",
+    kid: ["Dog","Cat","Cow","Horse","Pig","Sheep","Goat","Rabbit","Lion","Tiger",
       "Elephant","Bear","Monkey","Giraffe","Kangaroo","Panda","Zebra","Deer",
       "Fox","Wolf","Dolphin","Whale","Seal","Otter","Squirrel","Mouse","Rat",
       "Hedgehog","Bat","Raccoon"
     ],
-    adult: [
-      "Aardvark","Aardwolf","Alpaca","Antelope","Bison","Capybara","Chimpanzee",
+    adult: ["Aardvark","Aardwolf","Alpaca","Antelope","Bison","Capybara","Chimpanzee",
       "Cheetah","Dugong","Echidna","Fennecfox","Gerenuk","Hartebeest","Hyena",
       "Impala","Jackal","Koala","Lemur","Manatee","Meerkat","Moose","Narwhal",
       "Okapi","Platypus","Porcupine","Redpanda","Sloth","Tapir","Warthog",
@@ -16,13 +14,11 @@ const words = {
     ]
   },
   birds: {
-    kid: [
-      "Chicken","Duck","Goose","Swan","Owl","Eagle","Hawk","Parrot","Penguin",
+    kid: ["Chicken","Duck","Goose","Swan","Owl","Eagle","Hawk","Parrot","Penguin",
       "Flamingo","Peacock","Crow","Sparrow","Robin","Hummingbird","Toucan",
       "Woodpecker","Seagull","Pelican","Ostrich"
     ],
-    adult: [
-      "Albatross","Cassowary","Cockatoo","Condor","Crane","Falcon","Heron",
+    adult: ["Albatross","Cassowary","Cockatoo","Condor","Crane","Falcon","Heron",
       "Hornbill","Kingfisher","Kookaburra","Macaw","Nightingale","Quail",
       "Roadrunner","Shoebill"
     ]
@@ -49,30 +45,7 @@ const words = {
   }
 };
 
-// Show words for testing (Week 3 feature)
-function displayWords() {
-  const category = document.getElementById("categoryDropdown").value;
-  const difficulty = document.getElementById("difficultyDropdown").value;
-  const wordList = words[category] && words[category][difficulty];
-
-  const wordContainer = document.getElementById("wordContainer");
-  wordContainer.innerHTML = ""; // Clear previous content
-
-  if (wordList) {
-    const list = document.createElement("ul");
-    wordList.forEach(word => {
-      const listItem = document.createElement("li");
-      listItem.textContent = word;
-      list.appendChild(listItem);
-    });
-    wordContainer.appendChild(list);
-  } else {
-    wordContainer.textContent = "No words available for the selected category and difficulty.";
-  }
-}
-document.getElementById("showWordsButton").addEventListener("click", displayWords);
-
-// --- Grid Settings ---
+// --- Word Search Settings ---
 const gridSize = 12;
 
 // --- Utility Functions ---
@@ -80,72 +53,74 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+function randomChoice(arr) {
+  return arr[getRandomInt(arr.length)];
+}
+
 function createEmptyGrid() {
   return Array.from({ length: gridSize }, () => Array(gridSize).fill(""));
 }
 
-// --- Place Words (Right or Down Only) ---
-function placeWord(grid, word) {
-  const direction = Math.random() < 0.5 ? "right" : "down";
-  const len = word.length;
-
-  let row, col;
-  let fits = false;
-
-  while (!fits) {
-    row = getRandomInt(gridSize);
-    col = getRandomInt(gridSize);
-
-    if (direction === "right" && col + len <= gridSize) fits = true;
-    else if (direction === "down" && row + len <= gridSize) fits = true;
-  }
-
-  for (let i = 0; i < len; i++) {
-    if (direction === "right") grid[row][col + i] = word[i];
-    else grid[row + i][col] = word[i];
-  }
-}
-
-// --- Display Grid in HTML ---
-function displayGrid(grid) {
-  const gridDiv = document.getElementById("grid");
-  gridDiv.innerHTML = "";
-  gridDiv.style.display = "grid";
-  gridDiv.style.gridTemplateColumns = `repeat(${gridSize}, 30px)`;
-  gridDiv.style.gap = "2px";
-
-  for (let row of grid) {
-    for (let cell of row) {
-      const div = document.createElement("div");
-      div.className = "cell";
-      div.textContent = cell || "";
-      gridDiv.appendChild(div);
+function fillEmptySpaces(grid) {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      if (!grid[r][c]) {
+        grid[r][c] = alphabet[getRandomInt(alphabet.length)];
+      }
     }
   }
 }
 
-// --- Main Function to Generate Grid ---
-function generateGrid() {
-  const category = document.getElementById("categoryDropdown").value;
-  const difficulty = document.getElementById("difficultyDropdown").value;
-  const selectedWords = words[category][difficulty];
-  if (!selectedWords) return;
+function placeWord(grid, word) {
+  const direction = Math.random() < 0.5 ? "right" : "down";
+  const len = word.length;
+  let placed = false;
 
-  const numberOfWords = Math.min(5 + getRandomInt(4), selectedWords.length);
-  const chosenWords = selectedWords.sort(() => 0.5 - Math.random()).slice(0, numberOfWords);
+  while (!placed) {
+    const row = getRandomInt(gridSize);
+    const col = getRandomInt(gridSize);
 
-  const grid = createEmptyGrid();
-  chosenWords.forEach(word => placeWord(grid, word.toUpperCase()));
-  displayGrid(grid);
-
-  document.getElementById("wordList").textContent =
-    "Words: " + chosenWords.join(", ");
+    if (direction === "right" && col + len <= gridSize) {
+      for (let i = 0; i < len; i++) grid[row][col + i] = word[i];
+      placed = true;
+    } else if (direction === "down" && row + len <= gridSize) {
+      for (let i = 0; i < len; i++) grid[row + i][col] = word[i];
+      placed = true;
+    }
+  }
 }
 
-// ✅ Attach Event Listener Once
-document
-  document
-  .querySelector("button[onclick='generateGrid()']")
-  .addEventListener("click", generateGrid);
+function displayGrid(grid) {
+  const gridDiv = document.getElementById("grid");
+  gridDiv.innerHTML = "";
 
+  grid.flat().forEach(letter => {
+    const div = document.createElement("div");
+    div.className = "cell";
+    div.textContent = letter;
+    gridDiv.appendChild(div);
+  });
+}
 
+// --- Main Function ---
+function generateWordSearch() {
+  const categories = Object.keys(words);
+  const chosenCategory = randomChoice(categories);
+  const difficulty = Math.random() < 0.5 ? "kid" : "adult";
+  const selectedWords = words[chosenCategory][difficulty];
+
+  const grid = createEmptyGrid();
+  const numberOfWords = Math.min(6, selectedWords.length);
+
+  selectedWords
+    .sort(() => 0.5 - Math.random())
+    .slice(0, numberOfWords)
+    .forEach(word => placeWord(grid, word.toUpperCase()));
+
+  fillEmptySpaces(grid);
+  displayGrid(grid);
+  console.log(`Generated category: ${chosenCategory}, difficulty: ${difficulty}`);
+}
+
+window.onload = generateWordSearch;
