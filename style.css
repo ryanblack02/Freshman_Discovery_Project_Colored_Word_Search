@@ -1,38 +1,32 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
+  background-color: #f4f8fc;
   text-align: center;
   padding: 20px;
 }
 
-#word-container {
-  margin-top: 20px;
-  font-size: 18px;
-  font-weight: bold;
+h1 {
+  color: #2b4a75;
 }
 
-.grid-table {
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-
-.grid-table td {
-  width: 30px;
-  height: 30px;
-  text-align: center;
-  border: 1px solid #555;
-  font-family: monospace;
-  font-size: 18px;
+#grid {
+  margin: 20px auto;
+  display: grid;
+  grid-template-columns: repeat(12, 35px);
+  gap: 2px;
+  justify-content: center;
 }
 
 .cell {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #444;
+  width: 35px;
+  height: 35px;
+  border: 1px solid #333;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: monospace;
+  font-size: 18px;
   background-color: white;
-  color: black;
+  color: #222;
 }
+
