@@ -7,7 +7,35 @@
 </head>
 <body>
   <h1>Animal Word Search</h1>
+
+  <!-- Category & Difficulty Selection -->
+  <div id="controls">
+    <label for="categoryDropdown">Category:</label>
+    <select id="categoryDropdown">
+      <option value="mammals">Mammals</option>
+      <option value="birds">Birds</option>
+      <option value="reptiles">Reptiles</option>
+      <option value="amphibians">Amphibians</option>
+      <option value="fish">Fish</option>
+      <option value="insects">Insects</option>
+      <option value="invertebrates">Invertebrates</option>
+    </select>
+
+    <label for="difficultyDropdown">Difficulty:</label>
+    <select id="difficultyDropdown">
+      <option value="kid">Kid</option>
+      <option value="adult">Adult</option>
+    </select>
+
+    <button id="generateButton">Generate Word Search</button>
+  </div>
+
+  <!-- Display Category and Difficulty -->
+  <h2 id="categoryLabel"></h2>
+
+  <!-- Grid -->
   <div id="grid"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
