@@ -9,6 +9,12 @@ h1 {
   color: #2b4a75;
 }
 
+#categoryLabel {
+  color: #555;
+  font-size: 20px;
+  margin-top: 10px;
+}
+
 #grid {
   margin: 20px auto;
   display: grid;
@@ -29,4 +35,3 @@ h1 {
   background-color: white;
   color: #222;
 }
-
