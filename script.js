@@ -1,31 +1,31 @@
-// --- Full Word List Organized by Category & Difficulty ---
+// --- Full Word List ---
 const words = {
   mammals: {
     kid: ["Dog","Cat","Cow","Horse","Pig","Sheep","Goat","Rabbit","Lion","Tiger",
-      "Elephant","Bear","Monkey","Giraffe","Kangaroo","Panda","Zebra","Deer",
-      "Fox","Wolf","Dolphin","Whale","Seal","Otter","Squirrel","Mouse","Rat",
-      "Hedgehog","Bat","Raccoon"],
+          "Elephant","Bear","Monkey","Giraffe","Kangaroo","Panda","Zebra","Deer",
+          "Fox","Wolf","Dolphin","Whale","Seal","Otter","Squirrel","Mouse","Rat",
+          "Hedgehog","Bat","Raccoon"],
     adult: ["Aardvark","Aardwolf","Alpaca","Antelope","Bison","Capybara","Chimpanzee",
-      "Cheetah","Dugong","Echidna","Fennec fox","Gerenuk","Hartebeest","Hyena",
-      "Impala","Jackal","Koala","Lemur","Manatee","Meerkat","Moose","Narwhal",
-      "Okapi","Platypus","Porcupine","Red panda","Sloth","Tapir","Warthog",
-      "Wolverine"]
+            "Cheetah","Dugong","Echidna","Fennecfox","Gerenuk","Hartebeest","Hyena",
+            "Impala","Jackal","Koala","Lemur","Manatee","Meerkat","Moose","Narwhal",
+            "Okapi","Platypus","Porcupine","Redpanda","Sloth","Tapir","Warthog",
+            "Wolverine"]
   },
   birds: {
     kid: ["Chicken","Duck","Goose","Swan","Owl","Eagle","Hawk","Parrot","Penguin",
-      "Flamingo","Peacock","Crow","Sparrow","Robin","Hummingbird","Toucan",
-      "Woodpecker","Seagull","Pelican","Ostrich"],
+          "Flamingo","Peacock","Crow","Sparrow","Robin","Hummingbird","Toucan",
+          "Woodpecker","Seagull","Pelican","Ostrich"],
     adult: ["Albatross","Cassowary","Cockatoo","Condor","Crane","Falcon","Heron",
-      "Hornbill","Kingfisher","Kookaburra","Macaw","Nightingale","Quail",
-      "Roadrunner","Shoebill"]
+            "Hornbill","Kingfisher","Kookaburra","Macaw","Nightingale","Quail",
+            "Roadrunner","Shoebill"]
   },
   reptiles: {
-    kid: ["Snake","Lizard","Crocodile","Alligator","Turtle","Tortoise","Chameleon","Gecko","Iguana","Komodo dragon"],
-    adult: ["Anaconda","Basilisk","Boa","Gila","Monitor","Rattlesnake","Tuatara","Komodo dragon"]
+    kid: ["Snake","Lizard","Crocodile","Alligator","Turtle","Tortoise","Chameleon","Gecko","Iguana","Komododragon"],
+    adult: ["Anaconda","Basilisk","Boa","Gila","Monitor","Rattlesnake","Tuatara","Komododragon"]
   },
   amphibians: {
     kid: ["Frog","Toad","Salamander","Newt","Axolotl"],
-    adult: ["Cane toad","Glass frog","Fire-bellied toad","Olm","Surinam toad"]
+    adult: ["Canetoad","Glassfrog","Firebelliedtoad","Olm","Surinamtoad"]
   },
   fish: {
     kid: ["Goldfish","Salmon","Tuna","Shark","Clownfish","Trout","Seahorse","Catfish","Angelfish","Swordfish"],
@@ -33,93 +33,108 @@ const words = {
   },
   insects: {
     kid: ["Butterfly","Bee","Ant","Ladybug","Grasshopper","Dragonfly","Mosquito","Fly","Wasp","Beetle","Moth","Cricket"],
-    adult: ["Atlas moth","Cicada","Damselfly","Goliath beetle","Mantis","Scorpion","Tarantula","Walking stick"]
+    adult: ["Atlasmoth","Cicada","Damselfly","Goliathbeetle","Mantis","Scorpion","Tarantula","Walkingstick"]
   },
   invertebrates: {
     kid: ["Crab","Lobster","Shrimp","Jellyfish","Starfish","Octopus","Squid","Clam","Snail","Spider"],
-    adult: ["Horseshoe crab","Mantis","Nudibranch","Sea lion","Walrus","Yabby"]
+    adult: ["Horseshoecrab","Mantis","Nudibranch","Sealion","Walrus","Yabby"]
   }
 };
 
+// --- Grid Settings ---
 const gridSize = 12;
 
 // --- Utility Functions ---
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
-
-function createEmptyGrid() {
-  return Array.from({ length: gridSize }, () => Array(gridSize).fill(""));
-}
-
+function getRandomInt(max) { return Math.floor(Math.random() * max); }
+function randomChoice(arr) { return arr[getRandomInt(arr.length)]; }
+function createEmptyGrid() { return Array.from({ length: gridSize }, () => Array(gridSize).fill("")); }
 function fillEmptySpaces(grid) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
+  for (let r = 0; r < gridSize; r++)
+    for (let c = 0; c < gridSize; c++)
       if (!grid[r][c]) grid[r][c] = alphabet[getRandomInt(alphabet.length)];
-    }
-  }
 }
 
+// --- Place Words in 8 Directions ---
 function placeWord(grid, word) {
-  const direction = Math.random() < 0.5 ? "right" : "down";
+  const directions = [
+    "right","left","down","up",
+    "diagDownRight","diagDownLeft","diagUpRight","diagUpLeft"
+  ];
   const len = word.length;
-  let placed = false;
-  let attempts = 0;
-  const maxAttempts = 50; // Prevent infinite loop
+  let placed = false, attempts = 0, maxAttempts = 100;
 
   while (!placed && attempts < maxAttempts) {
     attempts++;
+    const direction = directions[getRandomInt(directions.length)];
     const row = getRandomInt(gridSize);
     const col = getRandomInt(gridSize);
+    let fits = true;
+    let positions = [];
 
-    if (direction === "right" && col + len <= gridSize) {
-      for (let i = 0; i < len; i++) grid[row][col + i] = word[i];
-      placed = true;
-    } else if (direction === "down" && row + len <= gridSize) {
-      for (let i = 0; i < len; i++) grid[row + i][col] = word[i];
-      placed = true;
+    for (let i = 0; i < len; i++) {
+      let r = row, c = col;
+      switch(direction){
+        case "right": c+=i; break;
+        case "left": c-=i; break;
+        case "down": r+=i; break;
+        case "up": r-=i; break;
+        case "diagDownRight": r+=i;c+=i; break;
+        case "diagDownLeft": r+=i;c-=i; break;
+        case "diagUpRight": r-=i;c+=i; break;
+        case "diagUpLeft": r-=i;c-=i; break;
+      }
+      if(r<0||r>=gridSize||c<0||c>=gridSize){ fits=false; break; }
+      positions.push([r,c]);
     }
+
+    if(fits){ positions.forEach(([r,c],i)=>grid[r][c]=word[i]); placed=true; }
   }
-  if (!placed) console.warn(`Could not place word: ${word}`);
+
+  if(!placed) console.warn(`Could not place word: ${word}`);
 }
 
-function displayGrid(grid) {
+// --- Display Grid ---
+function displayGrid(grid){
   const gridDiv = document.getElementById("grid");
-  let html = '';
-  grid.forEach(row => {
-    row.forEach(letter => {
-      html += `<div class="cell">${letter}</div>`;
-    });
+  gridDiv.innerHTML = "";
+  grid.flat().forEach(letter=>{
+    const div=document.createElement("div");
+    div.className="cell";
+    div.textContent=letter;
+    gridDiv.appendChild(div);
   });
-  gridDiv.innerHTML = html;
 }
 
-function generateWordSearch() {
+// --- Main Function with Button Safety ---
+let generating = false;
+function generateWordSearch(){
+  if(generating) return; // Prevent multiple clicks
+  generating = true;
+
   const category = document.getElementById("categoryDropdown").value;
   const difficulty = document.getElementById("difficultyDropdown").value;
   let selectedWords = words[category][difficulty];
-
-  // Filter words longer than grid
-  selectedWords = selectedWords.filter(word => word.length <= gridSize);
 
   const grid = createEmptyGrid();
   const numberOfWords = Math.min(6, selectedWords.length);
 
   selectedWords
-    .sort(() => 0.5 - Math.random())
+    .sort(()=>0.5 - Math.random())
     .slice(0, numberOfWords)
-    .forEach(word => placeWord(grid, word.toUpperCase()));
+    .forEach(word=>placeWord(grid, word.toUpperCase()));
 
   fillEmptySpaces(grid);
   displayGrid(grid);
 
   document.getElementById("categoryLabel").textContent =
-    `Category: ${category.charAt(0).toUpperCase() + category.slice(1)} – Difficulty: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`;
+    `Category: ${category.charAt(0).toUpperCase()+category.slice(1)} – Difficulty: ${difficulty.charAt(0).toUpperCase()+difficulty.slice(1)}`;
+
+  generating = false; // Done generating
 }
 
-// Attach button event
+// --- Event Listener ---
 document.getElementById("generateButton").addEventListener("click", generateWordSearch);
 
-// Generate initial grid on page load
+// --- Auto-generate on page load ---
 window.onload = generateWordSearch;
