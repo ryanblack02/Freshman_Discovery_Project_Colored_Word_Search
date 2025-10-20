@@ -1,7 +1,39 @@
-const words = { /* same word list as you already have */ };
+// --- Full Word List Organized by Category & Difficulty ---
+const words = {
+  mammals: {
+    kid: ["Dog", "Cat", "Cow", "Horse", "Pig", "Sheep", "Goat", "Rabbit", "Lion", "Tiger", "Elephant", "Bear", "Monkey", "Giraffe", "Kangaroo", "Panda", "Zebra", "Deer", "Fox", "Wolf", "Dolphin", "Whale", "Seal", "Otter", "Squirrel", "Mouse", "Rat", "Hedgehog", "Bat", "Raccoon"],
+    adult: ["Aardvark", "Aardwolf", "Alpaca", "Antelope", "Bison", "Capybara", "Chimpanzee", "Cheetah", "Dugong", "Echidna", "Fennec fox", "Gerenuk", "Hartebeest", "Hyena", "Impala", "Jackal", "Koala", "Lemur", "Manatee", "Meerkat", "Moose", "Narwhal", "Okapi", "Platypus", "Porcupine", "Red panda", "Sloth", "Tapir", "Warthog", "Wolverine"]
+  },
+  birds: {
+    kid: ["Chicken", "Duck", "Goose", "Swan", "Owl", "Eagle", "Hawk", "Parrot", "Penguin", "Flamingo", "Peacock", "Crow", "Sparrow", "Robin", "Hummingbird", "Toucan", "Woodpecker", "Seagull", "Pelican", "Ostrich"],
+    adult: ["Albatross", "Cassowary", "Cockatoo", "Condor", "Crane", "Falcon", "Heron", "Hornbill", "Kingfisher", "Kookaburra", "Macaw", "Nightingale", "Quail", "Roadrunner", "Shoebill"]
+  },
+  reptiles: {
+    kid: ["Snake", "Lizard", "Crocodile", "Alligator", "Turtle", "Tortoise", "Chameleon", "Gecko", "Iguana", "Komodo dragon"],
+    adult: ["Anaconda", "Basilisk", "Boa", "Gila", "Monitor", "Rattlesnake", "Tuatara", "Komodo dragon"]
+  },
+  amphibians: {
+    kid: ["Frog", "Toad", "Salamander", "Newt", "Axolotl"],
+    adult: ["Cane toad", "Glass frog", "Fire-bellied toad", "Olm", "Surinam toad"]
+  },
+  fish: {
+    kid: ["Goldfish", "Salmon", "Tuna", "Shark", "Clownfish", "Trout", "Seahorse", "Catfish", "Angelfish", "Swordfish"],
+    adult: ["Anglerfish", "Barracuda", "Betta", "Carp", "Eel", "Grouper", "Guppy", "Lionfish", "Mahi", "Marlin", "Piranha"]
+  },
+  insects: {
+    kid: ["Butterfly", "Bee", "Ant", "Ladybug", "Grasshopper", "Dragonfly", "Mosquito", "Fly", "Wasp", "Beetle", "Moth", "Cricket"],
+    adult: ["Atlas moth", "Cicada", "Damselfly", "Goliath beetle", "Mantis", "Scorpion", "Tarantula", "Walking stick"]
+  },
+  invertebrates: {
+    kid: ["Crab", "Lobster", "Shrimp", "Jellyfish", "Starfish", "Octopus", "Squid", "Clam", "Snail", "Spider"],
+    adult: ["Horseshoe crab", "Mantis", "Nudibranch", "Sea lion", "Walrus", "Yabby"]
+  }
+};
 
+// --- Word Search Settings ---
 const gridSize = 12;
 
+// --- Utility Functions ---
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
@@ -18,7 +50,9 @@ function fillEmptySpaces(grid) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
-      if (!grid[r][c]) grid[r][c] = alphabet[getRandomInt(alphabet.length)];
+      if (!grid[r][c]) {
+        grid[r][c] = alphabet[getRandomInt(alphabet.length)];
+      }
     }
   }
 }
@@ -56,6 +90,7 @@ function displayGrid(grid) {
   });
 }
 
+// --- Main Function ---
 function generateWordSearch() {
   const categories = Object.keys(words);
   const chosenCategory = randomChoice(categories);
@@ -73,7 +108,7 @@ function generateWordSearch() {
   fillEmptySpaces(grid);
   displayGrid(grid);
 
-  // Show category for user
+  // Show category and difficulty for user
   document.getElementById("categoryLabel").textContent =
     `Category: ${chosenCategory.charAt(0).toUpperCase() + chosenCategory.slice(1)} – Difficulty: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`;
 
