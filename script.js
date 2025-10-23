@@ -95,21 +95,94 @@ function placeWord(grid, word) {
 }
 
 // --- Display Grid ---
+let cellElements = [];
 function displayGrid(grid){
   const gridDiv = document.getElementById("grid");
   gridDiv.innerHTML = "";
-  grid.flat().forEach(letter=>{
-    const div=document.createElement("div");
-    div.className="cell";
-    div.textContent=letter;
-    gridDiv.appendChild(div);
-  });
+  gridDiv.style.gridTemplateColumns = `repeat(${gridSize}, 35px)`;
+  cellElements = [];
+
+  for (let r = 0; r < gridSize; r++) {
+    const row = [];
+    for (let c = 0; c < gridSize; c++) {
+      const div = document.createElement("div");
+      div.className = "cell";
+      div.dataset.row = r;
+      div.dataset.col = c;
+      div.textContent = grid[r][c];
+      gridDiv.appendChild(div);
+      row.push(div);
+    }
+    cellElements.push(row);
+  }
+}
+
+// --- Highlighting Setup ---
+let isDragging = false;
+let startCell = null;
+let endCell = null;
+let chosenWords = [];
+let foundWords = new Set();
+
+function onCellDown(e) {
+  isDragging = true;
+  startCell = e.target;
+  clearSelection();
+}
+
+function onCellUp(e) {
+  if (!isDragging || !startCell) return;
+  isDragging = false;
+  endCell = e.target;
+
+  const word = getSelectedWord(startCell, endCell);
+  if (word && chosenWords.includes(word)) {
+    foundWords.add(word);
+    highlightSelection(startCell, endCell, "#90ee90");
+  }
+}
+
+function getSelectedWord(start, end) {
+  const sr = parseInt(start.dataset.row);
+  const sc = parseInt(start.dataset.col);
+  const er = parseInt(end.dataset.row);
+  const ec = parseInt(end.dataset.col);
+  let dr = Math.sign(er - sr);
+  let dc = Math.sign(ec - sc);
+  let r = sr, c = sc, letters = "";
+
+  while (r >= 0 && c >= 0 && r < gridSize && c < gridSize) {
+    letters += cellElements[r][c].textContent;
+    if (r === er && c === ec) break;
+    r += dr; c += dc;
+  }
+  return letters;
+}
+
+function clearSelection() {
+  cellElements.flat().forEach(cell => cell.style.backgroundColor = "");
+}
+
+function highlightSelection(start, end, color) {
+  const sr = parseInt(start.dataset.row);
+  const sc = parseInt(start.dataset.col);
+  const er = parseInt(end.dataset.row);
+  const ec = parseInt(end.dataset.col);
+  let dr = Math.sign(er - sr);
+  let dc = Math.sign(ec - sc);
+  let r = sr, c = sc;
+
+  while (r >= 0 && c >= 0 && r < gridSize && c < gridSize) {
+    cellElements[r][c].style.backgroundColor = color;
+    if (r === er && c === ec) break;
+    r += dr; c += dc;
+  }
 }
 
 // --- Main Function with Button Safety ---
 let generating = false;
 function generateWordSearch(){
-  if(generating) return; // Prevent multiple clicks
+  if(generating) return;
   generating = true;
 
   const category = document.getElementById("categoryDropdown").value;
@@ -118,23 +191,28 @@ function generateWordSearch(){
 
   const grid = createEmptyGrid();
   const numberOfWords = Math.min(6, selectedWords.length);
+  chosenWords = selectedWords.sort(()=>0.5 - Math.random()).slice(0, numberOfWords).map(w => w.toUpperCase());
 
-  selectedWords
-    .sort(()=>0.5 - Math.random())
-    .slice(0, numberOfWords)
-    .forEach(word=>placeWord(grid, word.toUpperCase()));
-
+  chosenWords.forEach(word=>placeWord(grid, word));
   fillEmptySpaces(grid);
   displayGrid(grid);
 
-  document.getElementById("categoryLabel").textContent =
+  // Update labels
+  document.getElementById("categoryLabel").textContent = 
     `Category: ${category.charAt(0).toUpperCase()+category.slice(1)} – Difficulty: ${difficulty.charAt(0).toUpperCase()+difficulty.slice(1)}`;
 
-  generating = false; // Done generating
+  document.getElementById("wordListContainer").innerHTML = 
+    "<strong>Words in this puzzle:</strong> " + chosenWords.join(", ");
+
+  // Attach highlighting listeners
+  document.querySelectorAll(".cell").forEach(cell => {
+    cell.addEventListener("mousedown", onCellDown);
+    cell.addEventListener("mouseup", onCellUp);
+  });
+
+  generating = false;
 }
 
 // --- Event Listener ---
 document.getElementById("generateButton").addEventListener("click", generateWordSearch);
-
-// --- Auto-generate on page load ---
 window.onload = generateWordSearch;
