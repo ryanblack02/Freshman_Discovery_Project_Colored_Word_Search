@@ -29,3 +29,24 @@ h1 {
   background-color: white;
   color: #222;
 }
+
+#wordListContainer {
+  margin-top: 20px;
+  background-color: #e8f4ff;
+  border-radius: 8px;
+  padding: 10px;
+  display: inline-block;
+  text-align: left;
+}
+
+#wordListContainer ul {
+  list-style-type: square;
+  padding-left: 20px;
+  margin: 0;
+}
+
+#wordListContainer li {
+  font-size: 18px;
+  margin: 4px 0;
+}
+
