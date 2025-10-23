@@ -179,6 +179,14 @@ function highlightSelection(start, end, color) {
   }
 }
 
+// --- New: Display Word List ---
+function displayWordList(words) {
+  const container = document.getElementById("wordListContainer");
+  container.innerHTML = "<strong>Words to Find:</strong><ul>" +
+    words.map(w => `<li>${w}</li>`).join("") +
+    "</ul>";
+}
+
 // --- Main Function with Button Safety ---
 let generating = false;
 function generateWordSearch(){
@@ -196,13 +204,11 @@ function generateWordSearch(){
   chosenWords.forEach(word=>placeWord(grid, word));
   fillEmptySpaces(grid);
   displayGrid(grid);
+  displayWordList(chosenWords);
 
   // Update labels
   document.getElementById("categoryLabel").textContent = 
     `Category: ${category.charAt(0).toUpperCase()+category.slice(1)} – Difficulty: ${difficulty.charAt(0).toUpperCase()+difficulty.slice(1)}`;
-
-  document.getElementById("wordListContainer").innerHTML = 
-    "<strong>Words in this puzzle:</strong> " + chosenWords.join(", ");
 
   // Attach highlighting listeners
   document.querySelectorAll(".cell").forEach(cell => {
