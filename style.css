@@ -1,40 +1,94 @@
+/* --- Page & background --- */
+:root{
+  --bg0: #0b1220; /* deep navy */
+  --bg1: #10162a; /* indigo */
+  --glass: rgba(255,255,255,0.04);
+}
+*{box-sizing:border-box}
 body {
-  font-family: "Comic Sans MS", "Poppins", sans-serif;
-  text-align: center;
-  background: linear-gradient(180deg, #fefefe, #e3f6ff);
-  color: #333;
   margin: 0;
-  padding: 20px;
-}
-
-h1 {
-  color: #3b3b98;
-  text-shadow: 1px 1px 4px rgba(59, 59, 152, 0.3);
-}
-
-#grid {
-  display: grid;
-  justify-content: center;
-  margin-top: 20px;
-  gap: 3px;
-}
-
-.cell {
-  width: 35px;
-  height: 35px;
-  border: 1px solid #ccc;
+  min-height: 100vh;
+  font-family: "Poppins", "Comic Sans MS", system-ui, -apple-system, "Segoe UI", Roboto;
+  color: #e9f2ff;
+  background: radial-gradient(1200px 600px at 10% 10%, #0d1b2b 0%, var(--bg0) 20%, var(--bg1) 100%);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  font-weight: bold;
-  font-size: 22px;
-  text-transform: uppercase;
-  border-radius: 4px;
-  user-select: none;
-  transition: all 0.2s ease;
+  padding: 22px;
+  gap: 8px;
 }
 
-/* --- Kids Palette for Random Letters --- */
+/* header */
+h1{
+  margin: 6px 0 8px;
+  color: #f7fbff;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 12px rgba(255,255,255,0.02);
+  font-size: 28px;
+}
+
+/* controls */
+.controls{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.controls select, .controls label, .controls button{
+  font-size:14px;
+}
+.controls button{
+  background:#1f6feb;
+  color:#fff;
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  box-shadow: 0 6px 18px rgba(31,111,235,0.18);
+}
+.controls button:hover{ transform: translateY(-1px) }
+
+/* category label */
+#categoryLabel{ color: #cfe8ff; font-size:14px; }
+
+/* board */
+#boardWrap{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding:10px;
+  border-radius:10px;
+  box-shadow: 0 6px 30px rgba(0,0,0,0.5);
+}
+
+/* grid */
+#grid{
+  display:grid;
+  gap:6px;
+  padding:6px;
+}
+
+/* cell base */
+.cell{
+  width:40px;
+  height:40px;
+  border-radius:6px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:900;
+  font-size:18px;
+  text-transform:uppercase;
+  user-select:none;
+  -webkit-user-select:none;
+  cursor:pointer;
+  background: rgba(255,255,255,0.03);
+  transition: transform .12s ease, box-shadow .12s ease;
+  border:1px solid rgba(255,255,255,0.04);
+}
+
+/* subtle pop on hover */
+.cell:hover{ transform: translateY(-4px) scale(1.02); }
+
+/* --- kids palette for letters (text color) --- */
 .color-red { color: #FF4C4C; }
 .color-blue { color: #4C8CFF; }
 .color-green { color: #4CFF72; }
@@ -42,53 +96,98 @@ h1 {
 .color-purple { color: #C04CFF; }
 .color-pink { color: #FF6FCF; }
 
-/* --- Neon Highlight Effects --- */
-.highlight-red {
-  background-color: rgba(255, 76, 76, 0.3);
-  box-shadow: 0 0 8px #FF4C4C, 0 0 16px #FF4C4C;
+/* --- neon highlight classes (background + glow) --- */
+.highlight-red { background: rgba(255,76,76,0.12); box-shadow: 0 0 10px #FF4C4C, 0 0 22px rgba(255,76,76,0.65); }
+.highlight-blue { background: rgba(76,140,255,0.12); box-shadow: 0 0 10px #4C8CFF, 0 0 22px rgba(76,140,255,0.65); }
+.highlight-green { background: rgba(76,255,114,0.12); box-shadow: 0 0 10px #4CFF72, 0 0 22px rgba(76,255,114,0.65); }
+.highlight-orange { background: rgba(255,166,76,0.12); box-shadow: 0 0 10px #FFA64C, 0 0 22px rgba(255,166,76,0.65); }
+.highlight-purple { background: rgba(192,76,255,0.12); box-shadow: 0 0 10px #C04CFF, 0 0 22px rgba(192,76,255,0.65); }
+.highlight-pink { background: rgba(255,111,207,0.12); box-shadow: 0 0 10px #FF6FCF, 0 0 22px rgba(255,111,207,0.65); }
+
+/* glow animation (optional pulsing) */
+@keyframes neonPulse {
+  0% { box-shadow: 0 0 6px currentColor, 0 0 14px rgba(0,0,0,0); transform: scale(1); }
+  50% { box-shadow: 0 0 18px currentColor, 0 0 34px rgba(0,0,0,0.02); transform: scale(1.02); }
+  100% { box-shadow: 0 0 6px currentColor, 0 0 14px rgba(0,0,0,0); transform: scale(1); }
+}
+.glow { animation: neonPulse 1.1s ease-in-out infinite; }
+
+/* --- sparkle trail --- */
+#sparkles{ position: fixed; left:0; top:0; pointer-events:none; z-index:1200; }
+
+/* --- word list --- */
+#wordListContainer{
+  margin-top:14px;
+  background: rgba(255,255,255,0.02);
+  padding:10px 14px;
+  border-radius:8px;
+  color:#eaf6ff;
+  text-align:left;
+  width: min(760px, 92%);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+.word-chip{
+  display:inline-block;
+  margin:6px 8px 6px 0;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:15px;
+  text-transform:uppercase;
+  letter-spacing:0.6px;
+  background: rgba(255,255,255,0.03);
+  color: #fff;
+}
+.word-chip.marked{
+  filter: brightness(0.9);
+  opacity:0.75;
+  text-decoration:line-through;
+  transform: translateY(-2px) scale(0.98);
 }
 
-.highlight-blue {
-  background-color: rgba(76, 140, 255, 0.3);
-  box-shadow: 0 0 8px #4C8CFF, 0 0 16px #4C8CFF;
+/* mapping color classes to chip backgrounds for clarity */
+.word-chip.color-red{ background: linear-gradient(90deg,#ff6c6c22,#ff4c4c33); color:#fff; }
+.word-chip.color-blue{ background: linear-gradient(90deg,#6faaff22,#4c8cff33); color:#fff; }
+.word-chip.color-green{ background: linear-gradient(90deg,#74ffa522,#4cff7233); color:#0a0f00; }
+.word-chip.color-orange{ background: linear-gradient(90deg,#ffbf7a22,#ffa64c33); color:#fff; }
+.word-chip.color-purple{ background: linear-gradient(90deg,#c98cff22,#c04cff33); color:#fff; }
+.word-chip.color-pink{ background: linear-gradient(90deg,#ff9adf22,#ff6fcf33); color:#fff; }
+
+/* --- win overlay --- */
+#winOverlay{
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.45);
+  z-index:1300;
+}
+#winBox{
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  padding:22px;
+  border-radius:14px;
+  text-align:center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  transform: translateY(-10px) scale(0.98);
+}
+#winMessage{ font-size:24px; margin:0 0 12px 0; color: #fff; text-shadow:0 4px 26px rgba(0,0,0,0.5); }
+#playAgainButton{
+  background: linear-gradient(90deg,#45d06b,#1fa65f);
+  color:#04200a;
+  border:none;padding:10px 16px;border-radius:10px;font-weight:800;cursor:pointer;
+  box-shadow: 0 8px 18px rgba(31,166,95,0.22);
 }
 
-.highlight-green {
-  background-color: rgba(76, 255, 114, 0.3);
-  box-shadow: 0 0 8px #4CFF72, 0 0 16px #4CFF72;
-}
+/* hidden helper */
+.hidden{ display:none; }
 
-.highlight-orange {
-  background-color: rgba(255, 166, 76, 0.3);
-  box-shadow: 0 0 8px #FFA64C, 0 0 16px #FFA64C;
-}
-
-.highlight-purple {
-  background-color: rgba(192, 76, 255, 0.3);
-  box-shadow: 0 0 8px #C04CFF, 0 0 16px #C04CFF;
-}
-
-.highlight-pink {
-  background-color: rgba(255, 111, 207, 0.3);
-  box-shadow: 0 0 8px #FF6FCF, 0 0 16px #FF6FCF;
-}
-
-/* --- Optional glowing animation --- */
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 6px currentColor, 0 0 12px currentColor; }
-  50% { box-shadow: 0 0 14px currentColor, 0 0 28px currentColor; }
-}
-.glow {
-  animation: glow 1.3s infinite alternate;
-}
-
-#wordListContainer {
-  margin-top: 20px;
-  font-size: 18px;
-}
-
-#wordListContainer span {
-  padding: 2px 6px;
-  border-radius: 6px;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+/* confetti pieces */
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 16px;
+  opacity: 0.95;
+  transform-origin: center;
+  will-change: transform, top, left;
+  border-radius: 2px;
 }
