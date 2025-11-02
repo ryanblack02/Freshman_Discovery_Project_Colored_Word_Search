@@ -1,4 +1,4 @@
-// --- Word List ---
+// --- Full Animal Word List ---
 const words = {
   mammals: {
     kid: ["Dog","Cat","Cow","Horse","Pig","Sheep","Goat","Rabbit","Lion","Tiger",
@@ -20,24 +20,24 @@ const words = {
             "Roadrunner","Shoebill"]
   },
   reptiles: {
-    kid: ["Lizard","Snake","Crocodile","Turtle","Gecko","Iguana","Chameleon","Skink","Boa","Alligator"],
-    adult: ["Anaconda","Komododragon","Gharial","Viper","Rattlesnake","Tortoise","Python","Monitor","Basilisk","Terrapin"]
+    kid: ["Snake","Lizard","Turtle","Crocodile","Alligator","Chameleon","Gecko","Iguana"],
+    adult: ["Komododragon","GarterSnake","Boa","Python","Anole","Tortoise","Monitor"]
   },
   amphibians: {
-    kid: ["Frog","Toad","Newt","Salamander","Axolotl","Caecilian"],
-    adult: ["Bullfrog","Treefrog","Mudpuppy","Olm","Surinamtoad"]
+    kid: ["Frog","Toad","Salamander","Newt"],
+    adult: ["Axolotl","Caecilian"]
   },
   fish: {
-    kid: ["Goldfish","Tuna","Salmon","Trout","Cod","Shark","Clownfish","Swordfish","Carp","Catfish"],
-    adult: ["Anglerfish","Barracuda","Betta","Eel","Flounder","Grouper","Herring","Marlin","Pufferfish","Sturgeon"]
+    kid: ["Goldfish","Shark","Tuna","Trout","Salmon","Clownfish","Catfish"],
+    adult: ["Barracuda","Grouper","Swordfish","Anglerfish","Lionfish","Betta","Piranha"]
   },
   insects: {
-    kid: ["Ant","Bee","Butterfly","Dragonfly","Grasshopper","Ladybug","Mosquito","Beetle","Wasp","Cricket"],
-    adult: ["Firefly","Cicada","Moth","Prayingmantis","Locust","Earwig","Termite","Scarab","Weevil","Fleaworm"]
+    kid: ["Ant","Bee","Butterfly","Beetle","Fly","Wasp","Grasshopper","Ladybug"],
+    adult: ["Dragonfly","Cricket","Termite","Moth","Mosquito","PrayingMantis"]
   },
   invertebrates: {
-    kid: ["Spider","Crab","Snail","Slug","Octopus","Jellyfish","Worm","Clam","Squid","Starfish"],
-    adult: ["Anemone","Coral","Lobster","Barnacle","Seaurchin","Nautilus","Cuttlefish","Hydra","Scorpion","Centipede"]
+    kid: ["Snail","Worm","Jellyfish","Crab","Octopus","Starfish"],
+    adult: ["Lobster","Scorpion","Coral","Anemone","Cuttlefish"]
   }
 };
 
@@ -45,7 +45,7 @@ const words = {
 function getRandomInt(max) { return Math.floor(Math.random() * max); }
 function randomChoice(arr) { return arr[getRandomInt(arr.length)]; }
 
-// --- Dynamic Grid Size Based on Longest Word ---
+// --- Dynamic Grid Size ---
 function getGridSize(words) {
   const maxWordLength = Math.max(...words.map(w => w.length));
   return Math.max(12, maxWordLength + 3);
@@ -64,15 +64,14 @@ function fillEmptySpaces(grid) {
       if (!grid[r][c]) grid[r][c] = alphabet[getRandomInt(alphabet.length)];
 }
 
-// --- Place Word in 8 Directions ---
+// --- Word Placement (8 directions) ---
 function placeWord(grid, word) {
   const directions = [
     [0,1], [0,-1], [1,0], [-1,0],
     [1,1], [1,-1], [-1,1], [-1,-1]
   ];
   const size = grid.length;
-  let placed = false;
-  let attempts = 0;
+  let placed = false, attempts = 0;
 
   while (!placed && attempts < 200) {
     attempts++;
@@ -85,14 +84,14 @@ function placeWord(grid, word) {
     for (let i = 0; i < word.length; i++) {
       const r = row + dr*i;
       const c = col + dc*i;
-      if (r<0 || r>=size || c<0 || c>=size) { fits=false; break; }
+      if (r < 0 || r >= size || c < 0 || c >= size) { fits = false; break; }
       const cell = grid[r][c];
-      if (cell && cell !== word[i]) { fits=false; break; }
-      positions.push([r,c]);
+      if (cell && cell !== word[i]) { fits = false; break; }
+      positions.push([r, c]);
     }
 
     if (fits) {
-      positions.forEach(([r,c],i)=>grid[r][c]=word[i]);
+      positions.forEach(([r, c], i) => grid[r][c] = word[i]);
       placed = true;
     }
   }
@@ -100,8 +99,12 @@ function placeWord(grid, word) {
   if (!placed) console.warn(`Could not place word: ${word}`);
 }
 
-// --- Display Grid ---
+// --- Global Variables ---
 let cellElements = [];
+const kidColors = ["color-red", "color-blue", "color-green", "color-orange", "color-purple", "color-pink"];
+const neonColors = ["red","blue","green","orange","purple","pink"];
+
+// --- Display Grid ---
 function displayGrid(grid) {
   const gridDiv = document.getElementById("grid");
   gridDiv.innerHTML = "";
@@ -116,6 +119,11 @@ function displayGrid(grid) {
       div.dataset.row = r;
       div.dataset.col = c;
       div.textContent = grid[r][c];
+
+      // Assign random color for kid-style letters
+      const colorClass = kidColors[Math.floor(Math.random() * kidColors.length)];
+      div.classList.add(colorClass);
+
       gridDiv.appendChild(div);
       row.push(div);
     }
@@ -123,12 +131,36 @@ function displayGrid(grid) {
   }
 }
 
+// --- Display Word List (color coded) ---
+function displayWordList(words) {
+  const container = document.getElementById("wordListContainer");
+  container.innerHTML = "<strong>Words to Find:</strong><br>";
+  container.style.lineHeight = "1.8em";
+
+  words.forEach((word, i) => {
+    const span = document.createElement("span");
+    const colorClass = kidColors[i % kidColors.length];
+    span.textContent = word;
+    span.classList.add(colorClass);
+    span.style.fontWeight = "bold";
+    span.style.marginRight = "10px";
+    container.appendChild(span);
+  });
+}
+
+// --- Highlight Function (optional for future selection use) ---
+function highlightCells(cells, color) {
+  cells.forEach(cell => {
+    cell.classList.add(`highlight-${color}`, "glow");
+  });
+}
+
 // --- Generate Word Search ---
 function generateWordSearch() {
   const category = document.getElementById("categoryDropdown").value;
   const difficulty = document.getElementById("difficultyDropdown").value;
   let selectedWords = words[category][difficulty].map(w => w.toUpperCase());
-  selectedWords = selectedWords.sort(()=>0.5-Math.random()).slice(0,6); // pick 6 words
+  selectedWords = selectedWords.sort(() => 0.5 - Math.random()).slice(0, 6);
 
   const gridSize = getGridSize(selectedWords);
   const grid = createEmptyGrid(gridSize);
@@ -136,14 +168,12 @@ function generateWordSearch() {
   selectedWords.forEach(word => placeWord(grid, word));
   fillEmptySpaces(grid);
   displayGrid(grid);
+  displayWordList(selectedWords);
 
-  // Display Word List
   document.getElementById("categoryLabel").textContent =
     `Category: ${category.charAt(0).toUpperCase() + category.slice(1)} | Difficulty: ${difficulty}`;
-  document.getElementById("wordListContainer").innerHTML =
-    "<strong>Words to Find:</strong> " + selectedWords.join(", ");
 }
 
-// --- Event Listener ---
+// --- Event Listeners ---
 document.getElementById("generateButton").addEventListener("click", generateWordSearch);
 window.onload = generateWordSearch;
