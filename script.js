@@ -117,6 +117,17 @@ function displayGrid(grid){
   }
 }
 
+// --- Word List Display ---
+function updateWordListDisplay() {
+  const container = document.getElementById("wordListContainer");
+  container.innerHTML = "<strong>Words to Find:</strong><ul>" +
+    chosenWords.map(w => {
+      const found = foundWords.has(w);
+      return `<li style="text-decoration:${found ? 'line-through' : 'none'}; color:${found ? '#888' : '#000'}">${w}</li>`;
+    }).join("") +
+    "</ul>";
+}
+
 // --- Highlighting Setup ---
 let isDragging = false;
 let startCell = null;
@@ -139,6 +150,7 @@ function onCellUp(e) {
   if (word && chosenWords.includes(word)) {
     foundWords.add(word);
     highlightSelection(startCell, endCell, "#90ee90");
+    updateWordListDisplay();
   }
 }
 
@@ -179,14 +191,6 @@ function highlightSelection(start, end, color) {
   }
 }
 
-// --- New: Display Word List ---
-function displayWordList(words) {
-  const container = document.getElementById("wordListContainer");
-  container.innerHTML = "<strong>Words to Find:</strong><ul>" +
-    words.map(w => `<li>${w}</li>`).join("") +
-    "</ul>";
-}
-
 // --- Main Function with Button Safety ---
 let generating = false;
 function generateWordSearch(){
@@ -200,11 +204,12 @@ function generateWordSearch(){
   const grid = createEmptyGrid();
   const numberOfWords = Math.min(6, selectedWords.length);
   chosenWords = selectedWords.sort(()=>0.5 - Math.random()).slice(0, numberOfWords).map(w => w.toUpperCase());
+  foundWords.clear();
 
   chosenWords.forEach(word=>placeWord(grid, word));
   fillEmptySpaces(grid);
   displayGrid(grid);
-  displayWordList(chosenWords);
+  updateWordListDisplay();
 
   // Update labels
   document.getElementById("categoryLabel").textContent = 
