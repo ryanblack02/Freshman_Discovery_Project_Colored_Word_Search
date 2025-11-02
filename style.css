@@ -1,52 +1,44 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f8fc;
   text-align: center;
-  padding: 20px;
-}
-
-h1 {
-  color: #2b4a75;
+  background-color: #f2f7fa;
+  color: #333;
 }
 
 #grid {
-  margin: 20px auto;
   display: grid;
-  grid-template-columns: repeat(12, 35px);
-  gap: 2px;
   justify-content: center;
+  margin: 20px auto;
+  gap: 2px;
 }
 
 .cell {
-  width: 35px;
-  height: 35px;
-  border: 1px solid #333;
+  width: 32px;
+  height: 32px;
+  background-color: #fff;
+  border: 1px solid #ccc;
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-family: monospace;
-  font-size: 18px;
-  background-color: white;
-  color: #222;
+  align-items: center;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
 }
 
-#wordListContainer {
-  margin-top: 20px;
-  background-color: #e8f4ff;
-  border-radius: 8px;
-  padding: 10px;
+.cell.marked {
+  background-color: #b4e1ff;
+}
+
+.word-item {
+  margin: 3px;
   display: inline-block;
-  text-align: left;
+  padding: 5px 10px;
+  background-color: #e3f2fd;
+  border-radius: 8px;
 }
 
-#wordListContainer ul {
-  list-style-type: square;
-  padding-left: 20px;
-  margin: 0;
+.word-item.marked {
+  background-color: #81c784;
+  color: white;
+  text-decoration: line-through;
 }
-
-#wordListContainer li {
-  font-size: 18px;
-  margin: 4px 0;
-}
-
