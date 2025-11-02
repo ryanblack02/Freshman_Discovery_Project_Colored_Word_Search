@@ -126,20 +126,15 @@ function renderWordList(ws){
 
 /* --- Confetti + Congrats --- */
 function showCongratulations(){
-  // Remove old message if exists
   const oldMsg=document.getElementById("congratsMessage");
   if(oldMsg) oldMsg.remove();
 
-  // Add new message
   const msg=document.createElement("div");
   msg.id="congratsMessage";
   msg.style="font-size:24px;color:#fff;text-align:center;margin:12px;";
   msg.textContent="🎉 Congratulations! You found all words!";
   document.body.insertBefore(msg, document.getElementById("boardWrap"));
 
-  // Confetti
-  const confettiRoot=document.getElementById("confetti");
-  confettiRoot.innerHTML="";
   const colors=["#ff4c4c","#4c8cff","#4cff72","#ffa64c","#c04cff","#ff6fcf"];
   for(let i=0;i<70;i++){
     const piece=document.createElement("div");
@@ -197,9 +192,14 @@ function markWordFound(word,r1,c1,r2,c2){
     if(r===r2 && c===c2) break;
     r+=Math.sign(r2-r1); c+=Math.sign(c2-c1);
   }
-  document.querySelectorAll(".word-chip").forEach(ch=>{ if(ch.dataset.word===word) ch.classList.add("marked"); });
+  document.querySelectorAll(".word-chip").forEach(ch=>{
+    if(ch.dataset.word===word) ch.classList.add("marked");
+  });
   foundSet.add(word);
-  if(foundSet.size===chosenWords.length) showCongratulations();
+
+  if(foundSet.size===chosenWords.length){
+    showCongratulations();
+  }
 }
 
 /* --- Enable pointer --- */
@@ -210,7 +210,7 @@ function enableInteraction(grid){
     const rect=document.getElementById("grid").getBoundingClientRect();
     if(x<rect.left||x>rect.right||y<rect.top||y>rect.bottom) return null;
     const cw=rect.width/grid.length, ch=rect.height/grid.length;
-    return [Math.min(grid.length-1,Math.floor((y-rect.top)/ch)), Math.min(grid.length-1,Math.floor((x-rect.left)/cw))];
+    return [Math.min(grid.length-1, Math.floor((y-rect.top)/ch)), Math.min(grid.length-1, Math.floor((x-rect.left)/cw))];
   }
   const down=e=>{ isPointerDown=true; const p=getPointer(e); pointerStart=getCellFromPoint(p.clientX,p.clientY); pointerLast=pointerStart; if(pointerStart) showTemp(...pointerStart,...pointerStart); }
   const move=e=>{ if(!isPointerDown) return; const p=getPointer(e); const c=getCellFromPoint(p.clientX,p.clientY); if(c) pointerLast=c, showTemp(...pointerStart,...pointerLast); }
@@ -221,7 +221,6 @@ function enableInteraction(grid){
 
 /* --- Generate puzzle --- */
 function generateWordSearch(){
-  // Clear old confetti + congrats
   const old=document.getElementById("congratsMessage");
   if(old) old.remove();
   document.getElementById("confetti").innerHTML="";
@@ -247,4 +246,7 @@ function generateWordSearch(){
 }
 
 /* --- Init --- */
-window.onload=()=>{ generateWordSearch(); document.getElementById("generateButton").onclick=generateWordSearch; };
+window.onload=()=>{ 
+  generateWordSearch(); 
+  document.getElementById("generateButton").onclick=generateWordSearch; 
+};
