@@ -1,4 +1,4 @@
-// --- Full Word List ---
+// --- Word List ---
 const words = {
   mammals: {
     kid: ["Dog","Cat","Cow","Horse","Pig","Sheep","Goat","Rabbit","Lion","Tiger",
@@ -19,97 +19,107 @@ const words = {
             "Hornbill","Kingfisher","Kookaburra","Macaw","Nightingale","Quail",
             "Roadrunner","Shoebill"]
   }
-  // ... Add other categories as needed
+  // ... other categories
 };
 
 // --- Utility Functions ---
 function getRandomInt(max) { return Math.floor(Math.random() * max); }
 function randomChoice(arr) { return arr[getRandomInt(arr.length)]; }
-function createEmptyGrid(size) { return Array.from({ length: size }, () => Array(size).fill("")); }
+
+// --- Dynamic Grid Size Based on Longest Word ---
+function getGridSize(words) {
+  const maxWordLength = Math.max(...words.map(w => w.length));
+  return Math.max(12, maxWordLength + 3); // minimum 12x12 grid
+}
+
+// --- Create Empty Grid ---
+function createEmptyGrid(size) {
+  return Array.from({ length: size }, () => Array(size).fill(""));
+}
+
+// --- Fill Empty Spaces ---
 function fillEmptySpaces(grid) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (let r = 0; r < grid.length; r++)
-    for (let c = 0; c < grid[0].length; c++)
+    for (let c = 0; c < grid.length; c++)
       if (!grid[r][c]) grid[r][c] = alphabet[getRandomInt(alphabet.length)];
 }
 
-// --- Place Words in 8 Directions ---
+// --- Place Word in 8 Directions ---
 function placeWord(grid, word) {
   const directions = [
-    "right","left","down","up",
-    "diagDownRight","diagDownLeft","diagUpRight","diagUpLeft"
+    [0,1], [0,-1], [1,0], [-1,0],
+    [1,1], [1,-1], [-1,1], [-1,-1]
   ];
-  const len = word.length;
+  const size = grid.length;
   let placed = false;
+  let attempts = 0;
 
-  while (!placed) { // keep trying until the word is placed
-    const direction = randomChoice(directions);
-    const row = getRandomInt(grid.length);
-    const col = getRandomInt(grid[0].length);
+  while (!placed && attempts < 200) {
+    attempts++;
+    const [dr, dc] = directions[getRandomInt(directions.length)];
+    const row = getRandomInt(size);
+    const col = getRandomInt(size);
     let fits = true;
     let positions = [];
 
-    for (let i = 0; i < len; i++) {
-      let r = row, c = col;
-      switch(direction){
-        case "right": c+=i; break;
-        case "left": c-=i; break;
-        case "down": r+=i; break;
-        case "up": r-=i; break;
-        case "diagDownRight": r+=i;c+=i; break;
-        case "diagDownLeft": r+=i;c-=i; break;
-        case "diagUpRight": r-=i;c+=i; break;
-        case "diagUpLeft": r-=i;c-=i; break;
-      }
-      if(r<0||r>=grid.length||c<0||c>=grid[0].length) { fits=false; break; }
-      if(grid[r][c] && grid[r][c] !== word[i]) { fits=false; break; }
+    for (let i = 0; i < word.length; i++) {
+      const r = row + dr*i;
+      const c = col + dc*i;
+      if (r<0 || r>=size || c<0 || c>=size) { fits=false; break; }
+      const cell = grid[r][c];
+      if (cell && cell !== word[i]) { fits=false; break; }
       positions.push([r,c]);
     }
 
-    if(fits) {
+    if (fits) {
       positions.forEach(([r,c],i)=>grid[r][c]=word[i]);
       placed = true;
     }
   }
+
+  if (!placed) console.warn(`Could not place word: ${word}`);
 }
 
 // --- Display Grid ---
-function displayGrid(grid){
+let cellElements = [];
+function displayGrid(grid) {
   const gridDiv = document.getElementById("grid");
   gridDiv.innerHTML = "";
-  gridDiv.style.gridTemplateColumns = `repeat(${grid[0].length}, 35px)`;
+  gridDiv.style.gridTemplateColumns = `repeat(${grid.length}, 35px)`;
+  cellElements = [];
 
   for (let r = 0; r < grid.length; r++) {
-    for (let c = 0; c < grid[0].length; c++) {
+    const row = [];
+    for (let c = 0; c < grid.length; c++) {
       const div = document.createElement("div");
       div.className = "cell";
+      div.dataset.row = r;
+      div.dataset.col = c;
       div.textContent = grid[r][c];
       gridDiv.appendChild(div);
+      row.push(div);
     }
+    cellElements.push(row);
   }
 }
 
-// --- Main Function ---
-function generateWordSearch(){
+// --- Generate Word Search ---
+function generateWordSearch() {
   const category = document.getElementById("categoryDropdown").value;
   const difficulty = document.getElementById("difficultyDropdown").value;
-  const selectedWords = words[category][difficulty];
+  let selectedWords = words[category][difficulty].map(w => w.toUpperCase());
+  selectedWords = selectedWords.sort(()=>0.5-Math.random()).slice(0,6); // pick 6 words
 
-  const numberOfWords = Math.min(6, selectedWords.length);
-  const chosenWords = selectedWords.sort(()=>0.5 - Math.random()).slice(0, numberOfWords).map(w => w.toUpperCase());
-
-  // Determine dynamic grid size based on the longest word + extra space
-  const longestWordLength = Math.max(...chosenWords.map(w => w.length));
-  const gridSize = Math.max(longestWordLength + 4, 12); // min 12, plus extra space
-
+  const gridSize = getGridSize(selectedWords);
   const grid = createEmptyGrid(gridSize);
-  chosenWords.forEach(word => placeWord(grid, word));
+
+  selectedWords.forEach(word => placeWord(grid, word));
   fillEmptySpaces(grid);
   displayGrid(grid);
 
-  // Show word list below grid
-  document.getElementById("wordListContainer").innerHTML =
-    "<strong>Words in this puzzle:</strong> " + chosenWords.join(", ");
+  // Display Word List
+  document.getElementById("wordListContainer").innerHTML = "<strong>Words to Find:</strong> " + selectedWords.join(", ");
 }
 
 // --- Event Listener ---
