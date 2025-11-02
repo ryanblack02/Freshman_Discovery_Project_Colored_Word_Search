@@ -1,44 +1,83 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Comic Sans MS", "Poppins", sans-serif;
   text-align: center;
-  background-color: #f2f7fa;
+  background: linear-gradient(180deg, #fefefe, #e3f6ff);
   color: #333;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  color: #3b3b98;
+  text-shadow: 1px 1px 4px rgba(59, 59, 152, 0.3);
 }
 
 #grid {
   display: grid;
   justify-content: center;
-  margin: 20px auto;
-  gap: 2px;
+  margin-top: 20px;
+  gap: 3px;
 }
 
 .cell {
-  width: 32px;
-  height: 32px;
-  background-color: #fff;
+  width: 35px;
+  height: 35px;
   border: 1px solid #ccc;
   display: flex;
   justify-content: center;
   align-items: center;
   font-weight: bold;
-  cursor: pointer;
+  font-size: 22px;
+  text-transform: uppercase;
+  border-radius: 4px;
   user-select: none;
+  transition: all 0.2s ease;
 }
 
-.cell.marked {
-  background-color: #b4e1ff;
+/* --- Kids Palette for Random Letters --- */
+.color-red { color: #FF4C4C; }
+.color-blue { color: #4C8CFF; }
+.color-green { color: #4CFF72; }
+.color-orange { color: #FFA64C; }
+.color-purple { color: #C04CFF; }
+.color-pink { color: #FF6FCF; }
+
+/* --- Neon Highlight Effects --- */
+.highlight-red {
+  background-color: rgba(255, 76, 76, 0.3);
+  box-shadow: 0 0 8px #FF4C4C, 0 0 16px #FF4C4C;
 }
 
-.word-item {
-  margin: 3px;
-  display: inline-block;
-  padding: 5px 10px;
-  background-color: #e3f2fd;
-  border-radius: 8px;
+.highlight-blue {
+  background-color: rgba(76, 140, 255, 0.3);
+  box-shadow: 0 0 8px #4C8CFF, 0 0 16px #4C8CFF;
 }
 
-.word-item.marked {
-  background-color: #81c784;
-  color: white;
-  text-decoration: line-through;
+.highlight-green {
+  background-color: rgba(76, 255, 114, 0.3);
+  box-shadow: 0 0 8px #4CFF72, 0 0 16px #4CFF72;
+}
+
+.highlight-orange {
+  background-color: rgba(255, 166, 76, 0.3);
+  box-shadow: 0 0 8px #FFA64C, 0 0 16px #FFA64C;
+}
+
+.highlight-purple {
+  background-color: rgba(192, 76, 255, 0.3);
+  box-shadow: 0 0 8px #C04CFF, 0 0 16px #C04CFF;
+}
+
+.highlight-pink {
+  background-color: rgba(255, 111, 207, 0.3);
+  box-shadow: 0 0 8px #FF6FCF, 0 0 16px #FF6FCF;
+}
+
+/* --- Optional glowing animation --- */
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 6px currentColor, 0 0 12px currentColor; }
+  50% { box-shadow: 0 0 14px currentColor, 0 0 28px currentColor; }
+}
+.glow {
+  animation: glow 1.3s infinite alternate;
 }
