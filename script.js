@@ -18,8 +18,27 @@ const words = {
     adult: ["Albatross","Cassowary","Cockatoo","Condor","Crane","Falcon","Heron",
             "Hornbill","Kingfisher","Kookaburra","Macaw","Nightingale","Quail",
             "Roadrunner","Shoebill"]
+  },
+  reptiles: {
+    kid: ["Lizard","Snake","Crocodile","Turtle","Gecko","Iguana","Chameleon","Skink","Boa","Alligator"],
+    adult: ["Anaconda","Komododragon","Gharial","Viper","Rattlesnake","Tortoise","Python","Monitor","Basilisk","Terrapin"]
+  },
+  amphibians: {
+    kid: ["Frog","Toad","Newt","Salamander","Axolotl","Caecilian"],
+    adult: ["Bullfrog","Treefrog","Mudpuppy","Olm","Surinamtoad"]
+  },
+  fish: {
+    kid: ["Goldfish","Tuna","Salmon","Trout","Cod","Shark","Clownfish","Swordfish","Carp","Catfish"],
+    adult: ["Anglerfish","Barracuda","Betta","Eel","Flounder","Grouper","Herring","Marlin","Pufferfish","Sturgeon"]
+  },
+  insects: {
+    kid: ["Ant","Bee","Butterfly","Dragonfly","Grasshopper","Ladybug","Mosquito","Beetle","Wasp","Cricket"],
+    adult: ["Firefly","Cicada","Moth","Prayingmantis","Locust","Earwig","Termite","Scarab","Weevil","Fleaworm"]
+  },
+  invertebrates: {
+    kid: ["Spider","Crab","Snail","Slug","Octopus","Jellyfish","Worm","Clam","Squid","Starfish"],
+    adult: ["Anemone","Coral","Lobster","Barnacle","Seaurchin","Nautilus","Cuttlefish","Hydra","Scorpion","Centipede"]
   }
-  // ... other categories
 };
 
 // --- Utility Functions ---
@@ -29,7 +48,7 @@ function randomChoice(arr) { return arr[getRandomInt(arr.length)]; }
 // --- Dynamic Grid Size Based on Longest Word ---
 function getGridSize(words) {
   const maxWordLength = Math.max(...words.map(w => w.length));
-  return Math.max(12, maxWordLength + 3); // minimum 12x12 grid
+  return Math.max(12, maxWordLength + 3);
 }
 
 // --- Create Empty Grid ---
@@ -119,7 +138,10 @@ function generateWordSearch() {
   displayGrid(grid);
 
   // Display Word List
-  document.getElementById("wordListContainer").innerHTML = "<strong>Words to Find:</strong> " + selectedWords.join(", ");
+  document.getElementById("categoryLabel").textContent =
+    `Category: ${category.charAt(0).toUpperCase() + category.slice(1)} | Difficulty: ${difficulty}`;
+  document.getElementById("wordListContainer").innerHTML =
+    "<strong>Words to Find:</strong> " + selectedWords.join(", ");
 }
 
 // --- Event Listener ---
