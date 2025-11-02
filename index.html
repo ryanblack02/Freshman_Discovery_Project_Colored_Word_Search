@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Animal Word Search</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Animal Word Search — Neon</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Animal Word Search</h1>
 
-  <!-- Category & Difficulty Dropdowns -->
-  <div>
+  <!-- Controls -->
+  <div class="controls">
     <label for="categoryDropdown">Category:</label>
     <select id="categoryDropdown">
       <option value="mammals">Mammals</option>
@@ -26,21 +27,33 @@
       <option value="kid">Kid</option>
       <option value="adult">Adult</option>
     </select>
-  </div>
 
-  <!-- Generate Button -->
-  <div>
     <button id="generateButton">Generate Word Search</button>
   </div>
 
-  <!-- Display category & difficulty -->
-  <div id="categoryLabel" style="margin-top: 10px; font-weight: bold;"></div>
+  <div id="categoryLabel" style="margin-top:8px;font-weight:bold;"></div>
 
   <!-- Grid -->
-  <div id="grid"></div>
+  <div id="boardWrap">
+    <div id="grid" aria-hidden="false"></div>
+  </div>
 
-  <!-- Word List -->
-  <div id="wordListContainer" style="margin-top: 20px; font-size: 16px;"></div>
+  <!-- Word list -->
+  <div id="wordListContainer" aria-live="polite"></div>
+
+  <!-- Sparkle container (for drag trail) -->
+  <div id="sparkles"></div>
+
+  <!-- Win popup + Play Again -->
+  <div id="winOverlay" class="hidden">
+    <div id="winBox">
+      <h2 id="winMessage">🎉 You found them all!</h2>
+      <button id="playAgainButton">Play Again</button>
+    </div>
+  </div>
+
+  <!-- Confetti container -->
+  <div id="confetti"></div>
 
   <script src="script.js"></script>
 </body>
