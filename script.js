@@ -242,35 +242,49 @@ function initInteractionHandlers(){
 }
 
 /* --- Generate puzzle (reads dropdowns) --- */
-function generateWordSearch(){
-  // remove old congrats if present
-  const old=document.getElementById("congratsMessage");
-  if(old) old.remove();
+function generateWordSearch() {
+  // 🧹 Remove old congratulations message if present
+  const oldMsg = document.getElementById("congratsMessage");
+  if (oldMsg) oldMsg.remove();
 
-  foundSet=new Set(); chosenWords=[]; chosenWordColors={};
+  // 🔄 Reset global trackers
+  foundSet = new Set();
+  chosenWords = [];
+  chosenWordColors = {};
+  clearTemp();
 
+  // 🎯 Get selected category and difficulty
   const catEl = document.getElementById("categoryDropdown");
   const diffEl = document.getElementById("difficultyDropdown");
   const cat = catEl ? catEl.value : "mammals";
   const diff = diffEl ? diffEl.value : "kid";
 
-  // grab pool safely
+  // 📚 Get a safe copy of the word pool
   let pool = (words[cat] && words[cat][diff]) ? words[cat][diff].slice() : [];
-  pool = pool.map(w=>w.toUpperCase());
+  pool = pool.map(w => w.toUpperCase());
 
-  // random pick (6 as original)
-  chosenWords = pool.sort(()=>0.5-Math.random()).slice(0,6);
-  chosenWords.forEach((w,i)=>chosenWordColors[w]={highlightClass:neonClassForIndex(i)});
+  // 🎲 Randomly pick 6 words for this grid
+  chosenWords = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
 
+  // 🌈 Assign highlight classes for each word
+  chosenWords.forEach((w, i) => {
+    chosenWordColors[w] = { highlightClass: neonClassForIndex(i) };
+  });
+
+  // 🔢 Create a grid and place words
   const size = getGridSizeByWords(chosenWords);
   const grid = createEmptyGrid(size);
-  chosenWords.forEach(w=>placeWord(grid,w));
+  chosenWords.forEach(w => placeWord(grid, w));
   fillEmptySpaces(grid);
 
+  // 🧱 Render everything to the page
   currentGrid = grid;
   renderGridToDOM(grid);
   renderWordList(chosenWords);
-  document.getElementById("categoryLabel").textContent=`Category: ${cat} | Difficulty: ${diff}`;
+
+  // 🏷️ Update category/difficulty label
+  const label = document.getElementById("categoryLabel");
+  if (label) label.textContent = `Category: ${cat} | Difficulty: ${diff}`;
 }
 
 /* --- Init --- */
