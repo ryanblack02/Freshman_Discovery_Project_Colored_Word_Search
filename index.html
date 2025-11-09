@@ -4,17 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Animal Word Search</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
     <h1>Animal Word Search</h1>
+    <p id="categoryLabel">Category: mammals | Difficulty: kid</p>
   </header>
 
   <main>
     <section class="controls">
-      <label for="category">Choose a category:</label>
-      <select id="category">
+      <label for="categoryDropdown">Choose a category:</label>
+      <select id="categoryDropdown">
         <option value="mammals">Mammals</option>
         <option value="birds">Birds</option>
         <option value="reptiles">Reptiles</option>
@@ -24,22 +25,21 @@
         <option value="invertebrates">Invertebrates</option>
       </select>
 
-      <label for="difficulty">Choose a difficulty:</label>
-      <select id="difficulty">
+      <label for="difficultyDropdown">Choose a difficulty:</label>
+      <select id="difficultyDropdown">
         <option value="kid">Kid</option>
         <option value="adult">Adult</option>
       </select>
 
-      <button id="generateBtn">Generate New Grid</button>
+      <button id="generateButton">Generate New Grid</button>
     </section>
 
-    <section id="gridContainer">
+    <section id="boardWrap">
       <div id="grid"></div>
     </section>
 
     <section id="wordListContainer">
-      <h2>Find These Words:</h2>
-      <ul id="wordList"></ul>
+      <strong>Words to Find:</strong><br />
     </section>
   </main>
 
