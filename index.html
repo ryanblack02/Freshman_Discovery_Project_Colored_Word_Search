@@ -4,19 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Animal Word Search</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <h1>Animal Word Search</h1>
-    <p>Find all the animals hidden in the grid!</p>
   </header>
 
   <main>
-    <section id="controls">
-      <button id="generateButton">Generate New Grid</button>
-      <label for="categorySelect">Category:</label>
-      <select id="categorySelect">
+    <section class="controls">
+      <label for="category">Choose a category:</label>
+      <select id="category">
         <option value="mammals">Mammals</option>
         <option value="birds">Birds</option>
         <option value="reptiles">Reptiles</option>
@@ -25,26 +23,30 @@
         <option value="insects">Insects</option>
         <option value="invertebrates">Invertebrates</option>
       </select>
-      <label for="difficultySelect">Difficulty:</label>
-      <select id="difficultySelect">
+
+      <label for="difficulty">Choose a difficulty:</label>
+      <select id="difficulty">
         <option value="kid">Kid</option>
         <option value="adult">Adult</option>
       </select>
+
+      <button id="generateBtn">Generate New Grid</button>
     </section>
 
-    <section id="puzzleContainer">
+    <section id="gridContainer">
       <div id="grid"></div>
     </section>
 
-    <!-- 🧩 Fixed: This ID must match script.js -->
-    <section id="wordListContainer"></section>
+    <section id="wordListContainer">
+      <h2>Find These Words:</h2>
+      <ul id="wordList"></ul>
+    </section>
   </main>
 
   <footer>
-    <p>Created by Ryan Black | WDD 131</p>
+    <p>&copy; 2025 Animal Word Search</p>
   </footer>
 
-  <!-- 🧠 Make sure this script tag is at the END -->
   <script src="script.js"></script>
 </body>
 </html>
