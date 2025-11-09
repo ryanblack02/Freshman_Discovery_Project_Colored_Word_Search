@@ -2,51 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Animal Word Search — Neon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animal Word Search</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Animal Word Search</h1>
+  <header>
+    <h1>Animal Word Search</h1>
+    <p>Find all the animals hidden in the grid!</p>
+  </header>
 
-  <!-- Controls -->
-  <div class="controls">
-    <label for="categoryDropdown">Category:</label>
-    <select id="categoryDropdown">
-      <option value="mammals">Mammals</option>
-      <option value="birds">Birds</option>
-      <option value="reptiles">Reptiles</option>
-      <option value="amphibians">Amphibians</option>
-      <option value="fish">Fish</option>
-      <option value="insects">Insects</option>
-      <option value="invertebrates">Invertebrates</option>
-    </select>
+  <main>
+    <section id="controls">
+      <button id="generateButton">Generate New Grid</button>
+      <label for="categorySelect">Category:</label>
+      <select id="categorySelect">
+        <option value="mammals">Mammals</option>
+        <option value="birds">Birds</option>
+        <option value="reptiles">Reptiles</option>
+        <option value="amphibians">Amphibians</option>
+        <option value="fish">Fish</option>
+        <option value="insects">Insects</option>
+        <option value="invertebrates">Invertebrates</option>
+      </select>
+      <label for="difficultySelect">Difficulty:</label>
+      <select id="difficultySelect">
+        <option value="kid">Kid</option>
+        <option value="adult">Adult</option>
+      </select>
+    </section>
 
-    <label for="difficultyDropdown">Difficulty:</label>
-    <select id="difficultyDropdown">
-      <option value="kid">Kid</option>
-      <option value="adult">Adult</option>
-    </select>
+    <section id="puzzleContainer">
+      <div id="grid"></div>
+    </section>
 
-    <button id="generateButton">Generate Word Search</button>
-  </div>
+    <!-- 🧩 Fixed: This ID must match script.js -->
+    <section id="wordListContainer"></section>
+  </main>
 
-  <div id="categoryLabel" style="margin-top:8px;font-weight:bold;"></div>
+  <footer>
+    <p>Created by Ryan Black | WDD 131</p>
+  </footer>
 
-  <!-- Grid -->
-  <div id="boardWrap">
-    <div id="grid" aria-hidden="false"></div>
-  </div>
-
-  <!-- Word list -->
-  <div id="wordListContainer" aria-live="polite"></div>
-
-  <!-- Sparkle container (for drag trail) -->
-  <div id="sparkles"></div>
-
-  <!-- Confetti container -->
-  <div id="confetti"></div>
-
+  <!-- 🧠 Make sure this script tag is at the END -->
   <script src="script.js"></script>
 </body>
 </html>
