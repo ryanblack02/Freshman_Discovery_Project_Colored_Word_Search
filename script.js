@@ -1,17 +1,17 @@
 /* ===========================
    Animal Word Search — script.js
-   Complete revised version
+   Fully integrated (DOM-based hit detection + instructions)
    =========================== */
 
 let currentGrid = null;
-let cellElements = [];
-let chosenWords = [];
-let chosenWordColors = {};
+let cellElements = [];               // 2D array of DOM nodes [row][col]
+let chosenWords = [];                // UPPERCASE
+let chosenWordColors = {};           // word -> { highlightClass }
 let foundSet = new Set();
 let gridContainer = null;
 
 let isPointerDown = false;
-let pointerStart = null;
+let pointerStart = null;             // [r,c]
 let pointerLast = null;
 
 const kidColors = ["color-red","color-blue","color-green","color-orange","color-purple","color-pink"];
@@ -20,7 +20,7 @@ const neonClassForIndex = i => `highlight-${neonNames[i % neonNames.length]}`;
 const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
 const randInt = max => Math.floor(Math.random() * max);
 
-/* --- Word database (expanded where needed) --- */
+/* --- Word database --- */
 const words = {
   mammals: {
     kid: ["Dog","Cat","Cow","Horse","Pig","Sheep","Goat","Rabbit","Lion","Tiger",
@@ -63,7 +63,7 @@ const words = {
   }
 };
 
-/* Grid helpers */
+/* --- Grid helpers --- */
 function getGridSizeByWords(ws){
   const maxLen = Math.max(...ws.map(w=>w.length));
   return Math.max(12, maxLen + 3);
@@ -76,7 +76,7 @@ function fillEmptySpaces(grid){
       if(!grid[r][c]) grid[r][c]=randomChoice(alpha);
 }
 
-/* Word placement */
+/* --- Place words --- */
 function placeWord(grid,word){
   const dirs=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
   const size=grid.length;
@@ -100,7 +100,7 @@ function placeWord(grid,word){
   return false;
 }
 
-/* Rendering */
+/* --- Rendering --- */
 function renderGridToDOM(grid){
   const gridEl=document.getElementById("grid");
   gridEl.innerHTML="";
@@ -111,8 +111,9 @@ function renderGridToDOM(grid){
     for(let c=0;c<grid.length;c++){
       const el=document.createElement("div");
       el.className=`cell ${randomChoice(kidColors)}`;
-      el.dataset.row=r; el.dataset.col=c;
-      el.textContent=grid[r][c];
+      el.dataset.row = r;
+      el.dataset.col = c;
+      el.textContent = grid[r][c];
       gridEl.appendChild(el);
       rowEls.push(el);
     }
@@ -131,7 +132,19 @@ function renderWordList(ws){
   });
 }
 
-/* Path helpers */
+/* --- Path helpers --- */
+function getPath(r1,c1,r2,c2){
+  const path=[];
+  const dr=Math.sign(r2-r1), dc=Math.sign(c2-c1);
+  let r=r1,c=c1;
+  while(true){
+    path.push([r,c]);
+    if(r===r2 && c===c2) break;
+    r+=dr; c+=dc;
+    if(r<0||c<0||r>=currentGrid.length||c>=currentGrid.length) break;
+  }
+  return path;
+}
 function getPathWord(r1,c1,r2,c2,grid){
   const dr=Math.sign(r2-r1), dc=Math.sign(c2-c1);
   if(dr===0 && dc===0) return grid[r1][c1];
@@ -144,124 +157,192 @@ function getPathWord(r1,c1,r2,c2,grid){
   return str;
 }
 
-/* Temporary highlight */
-function clearTemp(){ document.querySelectorAll(".cell.temp").forEach(el=>el.classList.remove("temp")); }
+/* --- Temporary highlight and matching color --- */
+function clearTemp(){
+  document.querySelectorAll(".cell").forEach(cell=>{
+    cell.classList.remove("temp");
+    const toRemove = Array.from(cell.classList).filter(c => c.startsWith("highlight-"));
+    toRemove.forEach(c => {
+      if(!cell.classList.contains("glow")) cell.classList.remove(c);
+    });
+  });
+}
+
 function showTemp(r1,c1,r2,c2){
   clearTemp();
-  const dr=Math.sign(r2-r1), dc=Math.sign(c2-c1);
-  let r=r1,c=c1;
-  while(true){
-    if(r<0||c<0||r>=currentGrid.length||c>=currentGrid.length) break;
-    cellElements[r][c].classList.add("temp");
-    if(r===r2 && c===c2) break;
-    r+=dr; c+=dc;
+  if(!currentGrid) return;
+  const path = getPath(r1,c1,r2,c2);
+  if(path.length === 0) return;
+
+  // Build string for path
+  let str = "";
+  for(const [r,c] of path) str += currentGrid[r][c];
+
+  // Check if this path matches any chosen word (direct or reversed)
+  let matchWord = null;
+  for(const w of chosenWords){
+    if(w === str || w === str.split("").reverse().join("")) { matchWord = w; break; }
+  }
+
+  // If match found, get that word's highlight class
+  const tempHighlightClass = matchWord ? chosenWordColors[matchWord].highlightClass : null;
+
+  // Apply classes
+  for(const [r,c] of path){
+    const el = cellElements[r][c];
+    if(!el) continue;
+    el.classList.add("temp");
+    if(tempHighlightClass && !el.classList.contains("glow")) el.classList.add(tempHighlightClass);
   }
 }
 
-/* Mark found word */
+/* --- Mark found word --- */
 function markWordFound(word,r1,c1,r2,c2){
-  const info=chosenWordColors[word], cls=info.highlightClass;
-  let r=r1,c=c1;
-  while(true){
-    cellElements[r][c].classList.add(cls,"glow");
-    if(r===r2 && c===c2) break;
-    r+=Math.sign(r2-r1); c+=Math.sign(c2-c1);
+  const info = chosenWordColors[word];
+  const cls = info.highlightClass;
+  const path = getPath(r1,c1,r2,c2);
+  for(const [r,c] of path){
+    const el = cellElements[r][c];
+    if(!el) continue;
+    el.classList.add(cls, "glow");
+    el.classList.remove("temp");
   }
   document.querySelectorAll(".word-chip").forEach(ch=>{
-    if(ch.dataset.word===word) ch.classList.add("marked");
+    if(ch.dataset.word === word) ch.classList.add("marked");
   });
   foundSet.add(word);
-  if(foundSet.size===chosenWords.length) showCongratulations();
+  if(foundSet.size === chosenWords.length) showCongratulations();
 }
 
+/* --- Congrats --- */
 function showCongratulations(){
-  const old=document.getElementById("congratsMessage");
+  const old = document.getElementById("congratsMessage");
   if(old) old.remove();
-  const msg=document.createElement("div");
-  msg.id="congratsMessage";
-  msg.style="font-size:24px;color:#fff;text-align:center;margin:12px;";
-  msg.textContent="🎉 Congratulations! You found all words!";
+  const msg = document.createElement("div");
+  msg.id = "congratsMessage";
+  msg.style = "font-size:24px;color:#fff;text-align:center;margin:12px;";
+  msg.textContent = "🎉 Congratulations! You found all words!";
   document.body.insertBefore(msg, document.getElementById("boardWrap"));
 }
 
-/* Improved pointer math */
+/* --- DOM-based hit detection --- */
+function getCellFromPoint(x, y){
+  // Use elementFromPoint so we hit the real cell under the pointer; this avoids all scaling/zoom/padding offsets.
+  const el = document.elementFromPoint(x, y);
+  if(!el) return null;
+  // walk up until .cell found (in case sub-element)
+  let node = el;
+  while(node && node !== document.body){
+    if(node.classList && node.classList.contains("cell")){
+      const r = parseInt(node.dataset.row, 10);
+      const c = parseInt(node.dataset.col, 10);
+      if(Number.isFinite(r) && Number.isFinite(c)) return [r, c];
+      return null;
+    }
+    node = node.parentElement;
+  }
+  return null;
+}
+
+/* --- Interaction handlers (uses DOM hit detection) --- */
 function initInteractionHandlers(){
-  gridContainer=document.getElementById("grid");
+  gridContainer = document.getElementById("grid");
 
   function getPointer(e){ return e.touches ? e.touches[0] : e; }
 
-  function getCellFromPoint(x,y){
-    const rect=gridContainer.getBoundingClientRect();
-    const cw=rect.width/currentGrid.length;
-    const ch=rect.height/currentGrid.length;
-    const col=Math.floor((x-rect.left)/cw);
-    const row=Math.floor((y-rect.top)/ch);
-    if(row<0||col<0||row>=currentGrid.length||col>=currentGrid.length) return null;
-    return [row,col];
-  }
-
   function down(e){
     if(!currentGrid) return;
-    isPointerDown=true;
-    const p=getPointer(e);
-    pointerStart=getCellFromPoint(p.clientX,p.clientY);
-    pointerLast=pointerStart;
-    if(pointerStart) showTemp(...pointerStart,...pointerStart);
+    if(e.targetTouches) e.preventDefault?.();
+    isPointerDown = true;
+    const p = getPointer(e);
+    pointerStart = getCellFromPoint(p.clientX, p.clientY);
+    pointerLast = pointerStart;
+    if(pointerStart) showTemp(pointerStart[0], pointerStart[1], pointerStart[0], pointerStart[1]);
   }
+
   function move(e){
     if(!isPointerDown || !currentGrid) return;
-    const p=getPointer(e);
-    const c=getCellFromPoint(p.clientX,p.clientY);
-    if(c && pointerStart){ pointerLast=c; showTemp(...pointerStart,...pointerLast); }
+    const p = getPointer(e);
+    const c = getCellFromPoint(p.clientX, p.clientY);
+    if(!c || !pointerStart) return;
+    if(pointerLast && pointerLast[0] === c[0] && pointerLast[1] === c[1]) return;
+    pointerLast = c;
+    showTemp(pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1]);
   }
+
   function up(e){
     if(!isPointerDown || !currentGrid) return;
-    isPointerDown=false;
+    isPointerDown = false;
     if(pointerStart && pointerLast){
-      const w=getPathWord(...pointerStart,...pointerLast,currentGrid);
-      const rev=w.split("").reverse().join("");
-      if(chosenWords.includes(w)) markWordFound(w,...pointerStart,...pointerLast);
-      else if(chosenWords.includes(rev)) markWordFound(rev,...pointerStart,...pointerLast);
+      const w = getPathWord(pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1], currentGrid);
+      const rev = w.split("").reverse().join("");
+      if(chosenWords.includes(w)) markWordFound(w, pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1]);
+      else if(chosenWords.includes(rev)) markWordFound(rev, pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1]);
     }
     clearTemp();
-    pointerStart=null; pointerLast=null;
+    pointerStart = null; pointerLast = null;
   }
 
   gridContainer.addEventListener("mousedown", down);
+  gridContainer.addEventListener("touchstart", down, { passive: false });
+
   window.addEventListener("mousemove", move);
+  window.addEventListener("touchmove", move, { passive: false });
+
   window.addEventListener("mouseup", up);
-  gridContainer.addEventListener("touchstart", down, {passive:false});
-  window.addEventListener("touchmove", move, {passive:false});
   window.addEventListener("touchend", up);
 }
 
-/* Generate puzzle */
+/* --- Generate puzzle --- */
 function generateWordSearch(){
-  const oldMsg=document.getElementById("congratsMessage");
+  const oldMsg = document.getElementById("congratsMessage");
   if(oldMsg) oldMsg.remove();
-  foundSet=new Set(); chosenWords=[]; chosenWordColors={}; clearTemp();
+  foundSet = new Set(); chosenWords = []; chosenWordColors = {}; clearTemp();
 
-  const cat=document.getElementById("categoryDropdown").value;
-  const diff=document.getElementById("difficultyDropdown").value;
-  let pool=words[cat]?.[diff]?.slice()||[];
-  pool=pool.map(w=>w.toUpperCase());
-  chosenWords=pool.sort(()=>0.5-Math.random()).slice(0,6);
+  const cat = document.getElementById("categoryDropdown").value || "mammals";
+  const diff = document.getElementById("difficultyDropdown").value || "kid";
+  let pool = (words[cat] && words[cat][diff]) ? words[cat][diff].slice() : [];
+  pool = pool.map(w => w.toUpperCase());
 
-  chosenWords.forEach((w,i)=>chosenWordColors[w]={highlightClass:neonClassForIndex(i)});
-  const size=getGridSizeByWords(chosenWords);
-  const grid=createEmptyGrid(size);
-  chosenWords.forEach(w=>placeWord(grid,w));
+  // choose 6 words
+  chosenWords = pool.sort(()=>0.5 - Math.random()).slice(0, 6);
+  chosenWords.forEach((w, i) => chosenWordColors[w] = { highlightClass: neonClassForIndex(i) });
+
+  const size = getGridSizeByWords(chosenWords);
+  const grid = createEmptyGrid(size);
+  chosenWords.forEach(w => placeWord(grid, w));
   fillEmptySpaces(grid);
 
-  currentGrid=grid;
+  currentGrid = grid;
   renderGridToDOM(grid);
   renderWordList(chosenWords);
-  document.getElementById("categoryLabel").textContent=`Category: ${cat} | Difficulty: ${diff}`;
+  document.getElementById("categoryLabel").textContent = `Category: ${cat} | Difficulty: ${diff}`;
 }
 
-/* Init */
-window.onload=()=>{
+/* --- Instructions toggle --- */
+function initInstructionsToggle(){
+  const btn = document.getElementById("instrToggle");
+  const panel = document.getElementById("instructionsPanel");
+  btn.addEventListener("click", ()=>{
+    const isOpen = !panel.classList.contains("hidden");
+    if(isOpen){
+      panel.classList.add("hidden");
+      btn.setAttribute("aria-expanded","false");
+      panel.setAttribute("aria-hidden","true");
+    } else {
+      panel.classList.remove("hidden");
+      btn.setAttribute("aria-expanded","true");
+      panel.setAttribute("aria-hidden","false");
+      panel.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  });
+}
+
+/* --- Init --- */
+window.addEventListener("load", ()=>{
   initInteractionHandlers();
-  document.getElementById("generateButton").onclick=generateWordSearch;
-  generateWordSearch();
-};
+  initInstructionsToggle();
+  const genBtn = document.getElementById("generateButton");
+  if(genBtn) genBtn.onclick = generateWordSearch;
+  generateWordSearch(); // starter grid
+});
