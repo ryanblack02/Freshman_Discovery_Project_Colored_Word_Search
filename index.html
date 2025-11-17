@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Animal Word Search</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -32,6 +32,18 @@
       </select>
 
       <button id="generateButton">Generate New Grid</button>
+      <button id="instrToggle" aria-expanded="false" class="instr-toggle">Instructions</button>
+    </section>
+
+    <section id="instructionsPanel" class="instr-panel hidden" aria-hidden="true">
+      <h2>How to Play</h2>
+      <ul>
+        <li>Click or tap a letter to begin selecting a word.</li>
+        <li>Drag across letters in any direction: horizontal, vertical, diagonal, and backwards.</li>
+        <li>Release to check whether the selected letters form a word from the list.</li>
+        <li>Found words will lock in and glow with color; they will also be crossed off the list.</li>
+      </ul>
+      <p>The highlight trail shows what you’re selecting while you drag. Have fun!</p>
     </section>
 
     <section id="boardWrap">
