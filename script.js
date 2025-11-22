@@ -114,7 +114,8 @@ function renderGridToDOM(grid){
     const rowEls=[];
     for(let c=0;c<grid.length;c++){
       const el=document.createElement("div");
-      el.className=`cell ${randomChoice(kidColors)}`;
+      const color = randomChoice(kidColors);
+      el.className = `cell neon-text-${color}`; // apply neon text color
       el.dataset.row = r;
       el.dataset.col = c;
       el.textContent = grid[r][c];
@@ -193,10 +194,10 @@ function showTemp(r1,c1,r2,c2){
     const el = cellElements[r][c];
     if(!el) continue;
     el.classList.add("temp");
-    if(info && !el.classList.contains("glow")){
-      el.classList.add(info.bgClass);
-      el.classList.add(info.textClass);
-    }
+   if(info){
+     el.classList.add(info.bgClass);   // add glow background
+     // do NOT re-add textClass here, so neon text color remains
+}
   }
 }
 
