@@ -1,37 +1,24 @@
-/* ===========================
-   Word Search — cleaned & neon
-=========================== */
+/* Animal Word Search — script.js
+   - Confetti (canvas-confetti) triggers on completion
+   - Congrats banner stays until the user generates a new grid
+   - Works for initial auto-grid and any user-generated grid
+*/
 
 let currentGrid = null;
-let cellElements = [];
-let chosenWords = [];
-let chosenWordColors = {};
+let cellElements = [];               // 2D array of DOM nodes [r][c]
+let chosenWords = [];                // UPPERCASE words
+let chosenWordColors = {};           // word -> { highlightClass }
 let foundSet = new Set();
 
 let isPointerDown = false;
-let pointerStart = null;
+let pointerStart = null; // [r,c]
 let pointerLast = null;
 
-const colors = ["red","blue","green","orange","purple","pink","teal","yellow"];
-const neonTextClasses = colors.map(c=>`neon-text-${c}`);
-const neonBgClasses = colors.map(c=>`neon-bg-${c}`);
-
+const kidColors = ["color-red","color-blue","color-green","color-orange","color-purple","color-pink"];
+const neonNames = ["red","blue","green","orange","purple","pink"];
+const neonClassForIndex = i => `highlight-${neonNames[i % neonNames.length]}`;
 const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
 const randInt = max => Math.floor(Math.random() * max);
-
-/* --- Word colors: avoid neighbors --- */
-function assignWordColors(words){
-  const assigned = [];
-  for(let i=0; i<words.length; i++){
-    let idx;
-    do { idx = randInt(neonTextClasses.length); }
-    while(i > 0 && idx === assigned[i-1].idx);
-    assigned.push({ word: words[i], textClass: neonTextClasses[idx], bgClass: neonBgClasses[idx], idx });
-  }
-  const colorMap = {};
-  assigned.forEach(a=>{ colorMap[a.word]={textClass:a.textClass,bgClass:a.bgClass}; });
-  return colorMap;
-}
 
 const words = {
   mammals: {
@@ -64,63 +51,58 @@ const words = {
   }
 };
 
-
-/* ===========================
-   Grid helpers
-=========================== */
+/* --- Grid helpers --- */
 function getGridSizeByWords(ws){
   const maxLen = Math.max(...ws.map(w=>w.length));
   return Math.max(12, maxLen + 3);
 }
-function createEmptyGrid(size){ 
-  return Array.from({length:size},()=>Array(size).fill("")); 
+function createEmptyGrid(size){
+  return Array.from({length:size},()=>Array(size).fill(""));
 }
 function fillEmptySpaces(grid){
   const alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  for(let r=0;r<grid.length;r++)
-    for(let c=0;c<grid.length;c++)
+  for(let r=0;r<grid.length;r++){
+    for(let c=0;c<grid.length;c++){
       if(!grid[r][c]) grid[r][c]=randomChoice(alpha);
+    }
+  }
 }
 
-/* ===========================
-   Place words in grid
-=========================== */
+/* --- Place words into grid --- */
 function placeWord(grid,word){
   const dirs=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
-  const size=grid.length;
-  for(let attempt=0;attempt<400;attempt++){
-    const [dr,dc]=randomChoice(dirs);
-    const row=randInt(size), col=randInt(size);
-    const coords=[];
-    let fits=true;
+  const size = grid.length;
+  for(let attempt=0; attempt<400; attempt++){
+    const [dr,dc] = randomChoice(dirs);
+    const row = randInt(size), col = randInt(size);
+    const coords = [];
+    let fits = true;
     for(let i=0;i<word.length;i++){
-      const r=row+dr*i,c=col+dc*i;
+      const r = row + dr*i, c = col + dc*i;
       if(r<0||r>=size||c<0||c>=size){ fits=false; break; }
-      if(grid[r][c] && grid[r][c]!==word[i]){ fits=false; break; }
+      const cell = grid[r][c];
+      if(cell && cell !== word[i]) { fits=false; break; }
       coords.push([r,c]);
     }
     if(!fits) continue;
-    coords.forEach(([r,c],i)=>grid[r][c]=word[i]);
+    coords.forEach(([r,c],i)=> grid[r][c] = word[i]);
     return true;
   }
   console.warn("Couldn't place:", word);
   return false;
 }
 
-/* ===========================
-   Render grid & word list
-=========================== */
+/* --- Rendering --- */
 function renderGridToDOM(grid){
-  const gridEl=document.getElementById("grid");
-  gridEl.innerHTML="";
-  gridEl.style.gridTemplateColumns=`repeat(${grid.length}, 40px)`;
-  cellElements=[];
+  const gridEl = document.getElementById("grid");
+  gridEl.innerHTML = "";
+  gridEl.style.gridTemplateColumns = `repeat(${grid.length}, 40px)`;
+  cellElements = [];
   for(let r=0;r<grid.length;r++){
-    const rowEls=[];
+    const rowEls = [];
     for(let c=0;c<grid.length;c++){
-      const el=document.createElement("div");
-      const color = randomChoice(colors);
-      el.className = `cell neon-text-${color}`;
+      const el = document.createElement("div");
+      el.className = `cell ${randomChoice(kidColors)}`;
       el.dataset.row = r;
       el.dataset.col = c;
       el.textContent = grid[r][c];
@@ -132,53 +114,52 @@ function renderGridToDOM(grid){
 }
 
 function renderWordList(ws){
-  const cont=document.getElementById("wordListContainer");
-  cont.innerHTML="<strong>Words to Find:</strong><br>";
+  const cont = document.getElementById("wordListContainer");
+  cont.innerHTML = "<strong>Words to Find:</strong><br>";
   ws.forEach((w,i)=>{
-    const chip=document.createElement("span");
-    chip.className=`word-chip ${colors[i%colors.length]}`;
-    chip.textContent=w;
-    chip.dataset.word=w;
+    const chip = document.createElement("span");
+    chip.className = `word-chip ${kidColors[i % kidColors.length]}`;
+    chip.textContent = w;
+    chip.dataset.word = w;
     cont.appendChild(chip);
   });
 }
 
-/* ===========================
-   Path helpers
-=========================== */
+/* --- Path helpers --- */
 function getPath(r1,c1,r2,c2){
-  const path=[];
-  const dr=Math.sign(r2-r1), dc=Math.sign(c2-c1);
-  let r=r1,c=c1;
+  const path = [];
+  const dr = Math.sign(r2 - r1), dc = Math.sign(c2 - c1);
+  let r = r1, c = c1;
   while(true){
     path.push([r,c]);
-    if(r===r2 && c===c2) break;
-    r+=dr; c+=dc;
-    if(r<0||c<0||r>=currentGrid.length||c>=currentGrid.length) break;
+    if(r === r2 && c === c2) break;
+    r += dr; c += dc;
+    if(r<0 || c<0 || r>=currentGrid.length || c>=currentGrid.length) break;
   }
   return path;
 }
 
-function getPathWord(r1,c1,r2,c2){
-  const dr=Math.sign(r2-r1), dc=Math.sign(c2-c1);
-  let r=r1,c=c1,str="";
+function getPathWord(r1,c1,r2,c2,grid){
+  const dr = Math.sign(r2 - r1), dc = Math.sign(c2 - c1);
+  if(dr === 0 && dc === 0) return grid[r1][c1];
+  let r = r1, c = c1, str = "";
   while(true){
-    str+=currentGrid[r][c];
-    if(r===r2 && c===c2) break;
-    r+=dr; c+=dc;
+    str += grid[r][c];
+    if(r === r2 && c === c2) break;
+    r += dr; c += dc;
   }
   return str;
 }
 
-/* ===========================
-   Temporary highlight
-=========================== */
+/* --- Temporary highlight and clearing --- */
 function clearTemp(){
   document.querySelectorAll(".cell").forEach(cell=>{
     cell.classList.remove("temp");
-    colors.forEach(c=>{
-      cell.classList.remove(`highlight-${c}`);
-      cell.classList.remove(`neon-bg-${c}`);
+    // remove highlight-* classes if not permanent (no glow)
+    Array.from(cell.classList).forEach(c=>{
+      if(c.startsWith("highlight-") && !cell.classList.contains("glow")){
+        cell.classList.remove(c);
+      }
     });
   });
 }
@@ -188,172 +169,207 @@ function showTemp(r1,c1,r2,c2){
   if(!currentGrid) return;
   const path = getPath(r1,c1,r2,c2);
   if(path.length === 0) return;
-  let str = getPathWord(r1,c1,r2,c2);
-  let matchWord = chosenWords.find(w=> w===str || w.split("").reverse().join("")===w);
+  let str = "";
+  for(const [r,c] of path) str += currentGrid[r][c];
+
+  // find matching word (forward or reversed)
+  let matchWord = null;
+  for(const w of chosenWords){
+    const rev = w.split("").reverse().join("");
+    if(w === str || rev === str){ matchWord = w; break; }
+  }
+  const tempCls = matchWord ? chosenWordColors[matchWord].highlightClass : null;
+
   for(const [r,c] of path){
     const el = cellElements[r][c];
-    if(el) {
-      el.classList.add("temp");
-      if(matchWord) el.classList.add(chosenWordColors[matchWord].bgClass);
-    }
+    if(!el) continue;
+    el.classList.add("temp");
+    if(tempCls && !el.classList.contains("glow")) el.classList.add(tempCls);
   }
 }
 
-/* ===========================
-   Mark found word
-=========================== */
+/* --- Mark found word --- */
 function markWordFound(word,r1,c1,r2,c2){
-  const path = getPath(r1,c1,r2,c2);
+  if(foundSet.has(word)) return; // already marked
   const info = chosenWordColors[word];
+  const cls = info ? info.highlightClass : null;
+  const path = getPath(r1,c1,r2,c2);
   for(const [r,c] of path){
     const el = cellElements[r][c];
-    if(el){
-      el.className = `cell ${info.textClass} ${info.bgClass} glow`;
-    }
+    if(!el) continue;
+    if(cls) el.classList.add(cls);
+    el.classList.add("glow");
+    el.classList.remove("temp");
   }
   document.querySelectorAll(".word-chip").forEach(ch=>{
-    if(ch.dataset.word===word) ch.classList.add("marked");
+    if(ch.dataset.word === word) ch.classList.add("marked");
   });
   foundSet.add(word);
-  if(foundSet.size===chosenWords.length) showCongratulations();
-}
 
-/* ===========================
-   Congratulations banner
-=========================== */
-function showCongratulations(){
-  const old = document.getElementById("congratsMessage");
-  if(old) old.remove();
-
-  const msg = document.createElement("div");
-  msg.id = "congratsMessage";
-  msg.textContent = "🎉 Congratulations! You found all words!";
-
-  const color = randomChoice(colors);
-  msg.className = `neon-text-${color} neon-bg-${color}`;
-  msg.style.fontSize = "24px";
-  msg.style.textAlign = "center";
-  msg.style.margin = "12px 0";
-  msg.style.padding = "6px 12px";
-  msg.style.borderRadius = "8px";
-
-  const boardWrap = document.getElementById("boardWrap");
-  if(boardWrap) document.body.insertBefore(msg, boardWrap);
-  else document.body.appendChild(msg);
-
-  if(window.confetti){
-    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+  if(foundSet.size === chosenWords.length){
+    showCongratulations();
   }
 }
 
-/* ===========================
-   Pointer & interaction
-=========================== */
-function getCellFromPoint(x,y){
-  const el=document.elementFromPoint(x,y);
+/* --- Congratulations + confetti --- */
+function showCongratulations(){
+  // avoid multiple calls
+  const existing = document.getElementById("congratsBanner");
+  if(existing) return;
+
+  const banner = document.createElement("div");
+  banner.id = "congratsBanner";
+  banner.className = "show";
+  banner.textContent = "🎉 Congratulations! You found all the words!";
+  // Insert banner above boardWrap
+  const boardWrap = document.getElementById("boardWrap");
+  boardWrap.parentNode.insertBefore(banner, boardWrap);
+
+  // Confetti burst (big initial burst + a lightweight stream)
+  try {
+    confetti({
+      particleCount: 150,
+      spread: 100,
+      origin: { y: 0.35 }
+    });
+    // small continuing stream for 800ms
+    const end = Date.now() + 800;
+    (function frame() {
+      confetti({
+        particleCount: 6,
+        spread: 60,
+        origin: { x: Math.random(), y: Math.random() * 0.6 + 0.2 }
+      });
+      if(Date.now() < end) requestAnimationFrame(frame);
+    })();
+  } catch (err) {
+    // confetti lib not available — silently ignore
+    console.warn("confetti failed:", err);
+  }
+}
+
+/* remove any existing congrats banner (used when generating new grid) */
+function removeCongratsBanner(){
+  const b = document.getElementById("congratsBanner");
+  if(b) b.remove();
+}
+
+/* --- DOM hit detection helper --- */
+function getCellFromPoint(x, y){
+  const el = document.elementFromPoint(x, y);
   if(!el) return null;
-  let node=el;
-  while(node && node!==document.body){
-    if(node.classList.contains("cell")){
-      return [parseInt(node.dataset.row,10),parseInt(node.dataset.col,10)];
+  let node = el;
+  while(node && node !== document.body){
+    if(node.classList && node.classList.contains("cell")){
+      const r = parseInt(node.dataset.row, 10);
+      const c = parseInt(node.dataset.col, 10);
+      if(Number.isFinite(r) && Number.isFinite(c)) return [r, c];
+      return null;
     }
     node = node.parentElement;
   }
   return null;
 }
 
+/* --- Interaction handlers --- */
 function initInteractionHandlers(){
-  const gridContainer = document.getElementById("grid");
-  const getPointer = e => e.touches ? e.touches[0] : e;
+  const gridEl = document.getElementById("grid");
+
+  function getPointer(e){ return e.touches ? e.touches[0] : e; }
 
   function down(e){
     if(!currentGrid) return;
-    isPointerDown=true;
-    pointerStart=getCellFromPoint(getPointer(e).clientX,getPointer(e).clientY);
-    pointerLast=pointerStart;
-    if(pointerStart) showTemp(pointerStart[0],pointerStart[1],pointerStart[0],pointerStart[1]);
+    if(e.touches) e.preventDefault?.();
+    isPointerDown = true;
+    const p = getPointer(e);
+    pointerStart = getCellFromPoint(p.clientX, p.clientY);
+    pointerLast = pointerStart;
+    if(pointerStart) showTemp(pointerStart[0], pointerStart[1], pointerStart[0], pointerStart[1]);
   }
+
   function move(e){
     if(!isPointerDown || !currentGrid) return;
-    const c=getCellFromPoint(getPointer(e).clientX,getPointer(e).clientY);
+    const p = getPointer(e);
+    const c = getCellFromPoint(p.clientX, p.clientY);
     if(!c || !pointerStart) return;
-    if(pointerLast && pointerLast[0]===c[0] && pointerLast[1]===c[1]) return;
-    pointerLast=c;
-    showTemp(pointerStart[0],pointerStart[1],pointerLast[0],pointerLast[1]);
+    if(pointerLast && pointerLast[0] === c[0] && pointerLast[1] === c[1]) return;
+    pointerLast = c;
+    showTemp(pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1]);
   }
-  function up(e){
+
+  function up(){
     if(!isPointerDown || !currentGrid) return;
-    isPointerDown=false;
+    isPointerDown = false;
     if(pointerStart && pointerLast){
-      const w = getPathWord(pointerStart[0],pointerStart[1],pointerLast[0],pointerLast[1]);
+      const w = getPathWord(pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1], currentGrid);
       const rev = w.split("").reverse().join("");
-      if(chosenWords.includes(w)) markWordFound(w,pointerStart[0],pointerStart[1],pointerLast[0],pointerLast[1]);
-      else if(chosenWords.includes(rev)) markWordFound(rev,pointerStart[0],pointerStart[1],pointerLast[0],pointerLast[1]);
+      if(chosenWords.includes(w)) markWordFound(w, pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1]);
+      else if(chosenWords.includes(rev)) markWordFound(rev, pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1]);
     }
     clearTemp();
-    pointerStart = null; pointerLast = null;
+    pointerStart = null;
+    pointerLast = null;
   }
 
-  gridContainer.addEventListener("mousedown",down);
-  gridContainer.addEventListener("touchstart",down,{passive:false});
-  window.addEventListener("mousemove",move);
-  window.addEventListener("touchmove",move,{passive:false});
-  window.addEventListener("mouseup",up);
-  window.addEventListener("touchend",up);
+  gridEl.addEventListener("mousedown", down);
+  gridEl.addEventListener("touchstart", down, { passive: false });
+  window.addEventListener("mousemove", move);
+  window.addEventListener("touchmove", move, { passive: false });
+  window.addEventListener("mouseup", up);
+  window.addEventListener("touchend", up);
 }
 
-/* ===========================
-   Generate puzzle
-=========================== */
+/* --- Generate puzzle --- */
 function generateWordSearch(){
-  const oldMsg=document.getElementById("congratsMessage");
-  if(oldMsg) oldMsg.remove();
-  foundSet=new Set(); chosenWords=[]; chosenWordColors={}; clearTemp();
+  // remove any existing congrats banner when starting a new puzzle
+  removeCongratsBanner();
 
-  const cat=document.getElementById("categoryDropdown")?.value||"mammals";
-  const diff=document.getElementById("difficultyDropdown")?.value||"kid";
-  let pool=(words[cat] && words[cat][diff])? words[cat][diff].slice() : [];
-  
-  chosenWords = pool.sort(()=>0.5-Math.random()).slice(0,6);
+  foundSet = new Set(); chosenWords = []; chosenWordColors = {};
+  clearTemp();
 
-  // Assign colors avoiding duplicates
-  chosenWords.forEach((w,i)=>{
-    const idx = i % colors.length;
-    chosenWordColors[w]={ textClass: neonTextClasses[idx], bgClass: neonBgClasses[idx] };
-  });
+  const cat = document.getElementById("categoryDropdown").value || "mammals";
+  const diff = document.getElementById("difficultyDropdown").value || "kid";
+  let pool = (words[cat] && words[cat][diff]) ? words[cat][diff].slice() : [];
+  pool = pool.map(w => w.toUpperCase());
 
-  const size=getGridSizeByWords(chosenWords);
-  const grid=createEmptyGrid(size);
-  chosenWords.forEach(w=>placeWord(grid,w));
+  // choose 6 words (keeps original behavior)
+  chosenWords = pool.sort(()=>0.5 - Math.random()).slice(0, 6);
+  chosenWords.forEach((w, i) => chosenWordColors[w] = { highlightClass: neonClassForIndex(i) });
+
+  const size = getGridSizeByWords(chosenWords);
+  const grid = createEmptyGrid(size);
+
+  // try placing all chosen words (if any fail it's ok — they were warned in console)
+  chosenWords.forEach(w => placeWord(grid, w));
   fillEmptySpaces(grid);
-  currentGrid=grid;
 
+  currentGrid = grid;
   renderGridToDOM(grid);
   renderWordList(chosenWords);
-  document.getElementById("categoryLabel").textContent=`Category: ${cat} | Difficulty: ${diff}`;
+
+  document.getElementById("categoryLabel").textContent = `Category: ${cat} | Difficulty: ${diff}`;
 }
 
-/* ===========================
-   Init instructions toggle
-=========================== */
+/* --- Instructions toggle --- */
 function initInstructionsToggle(){
-  const btn=document.getElementById("instrToggle");
-  const panel=document.getElementById("instructionsPanel");
-  btn?.addEventListener("click",()=>{
-    const hidden = panel.classList.contains("hidden");
-    panel.classList.toggle("hidden");
-    btn.setAttribute("aria-expanded", hidden?"true":"false");
-    panel.setAttribute("aria-hidden", hidden?"false":"true");
-    if(hidden) panel.scrollIntoView({behavior:"smooth",block:"center"});
+  const btn = document.getElementById("instrToggle");
+  const panel = document.getElementById("instructionsPanel");
+  btn.addEventListener("click", ()=>{
+    const isHidden = panel.classList.toggle("hidden");
+    btn.setAttribute("aria-expanded", (!isHidden).toString());
+    panel.setAttribute("aria-hidden", isHidden.toString());
+    if(!isHidden) panel.scrollIntoView({behavior:"smooth", block:"center"});
   });
 }
 
-/* ===========================
-   Window load
-=========================== */
-window.addEventListener("load",()=>{
+/* --- Init --- */
+window.addEventListener("load", ()=>{
   initInteractionHandlers();
   initInstructionsToggle();
-  document.getElementById("generateButton")?.addEventListener("click",generateWordSearch);
+
+  const genBtn = document.getElementById("generateButton");
+  genBtn.addEventListener("click", generateWordSearch);
+
+  // initial puzzle
   generateWordSearch();
 });
