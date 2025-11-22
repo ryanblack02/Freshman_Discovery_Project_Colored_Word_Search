@@ -188,16 +188,19 @@ function showTemp(r1,c1,r2,c2){
   }
 }
 
-/* --- Mark found word --- */
 function markWordFound(word,r1,c1,r2,c2){
   if(foundSet.has(word)) return; // already marked
-  const info = chosenWordColors[word];
-  const cls = info ? info.highlightClass : null;
   const path = getPath(r1,c1,r2,c2);
   for(const [r,c] of path){
     const el = cellElements[r][c];
     if(!el) continue;
-    if(cls) el.classList.add(cls);
+    // preserve original color class
+    const colorClass = Array.from(el.classList).find(cl=>cl.startsWith("color-"));
+    if(colorClass){
+      // add corresponding highlight class based on color
+      const neonName = colorClass.replace("color-","");
+      el.classList.add(`highlight-${neonName}`);
+    }
     el.classList.add("glow");
     el.classList.remove("temp");
   }
@@ -209,6 +212,8 @@ function markWordFound(word,r1,c1,r2,c2){
   if(foundSet.size === chosenWords.length){
     showCongratulations();
   }
+}
+
 }
 
 /* --- Congratulations + confetti --- */
