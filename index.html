@@ -46,7 +46,11 @@
       <p>The highlight trail shows what you’re selecting while you drag. Have fun!</p>
     </section>
 
-    <!-- congrats banner is injected here (before boardWrap) via JS -->
+    <!-- congrats banner — remains visible until user generates a new grid -->
+    <div id="congratsBanner" role="status" aria-live="polite" class="hidden">
+      🎉 Congratulations! You found all the words!
+    </div>
+
     <section id="boardWrap">
       <div id="grid" role="grid" aria-label="Word search grid"></div>
     </section>
