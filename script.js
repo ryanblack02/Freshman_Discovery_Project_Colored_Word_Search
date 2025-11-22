@@ -1,31 +1,40 @@
-/* Animal Word Search — script.js
-   - Confetti (canvas-confetti) triggers on completion
-   - Congrats banner stays until user generates a new grid (Option B)
-   - When a word is found the letter text color matches highlight (solid + glow)
-*/
+/* ===========================
+   Animal Word Search — script.js
+   - Confetti triggers on completion
+   - Letter colors match highlight (solid + glow)
+   - Neighbor-safe word list colors
+   =========================== */
 
 let currentGrid = null;
-let cellElements = [];               // 2D array of DOM nodes [r][c]
-let chosenWords = [];                // uppercase words
-let chosenWordColors = {};           // word -> { textClass, bgClass }
+let cellElements = [];               
+let chosenWords = [];                
+let chosenWordColors = {};           
 let foundSet = new Set();
 
 let isPointerDown = false;
-let pointerStart = null; // [r,c]
+let pointerStart = null; 
 let pointerLast = null;
 
-const kidColors = ["color-red","color-blue","color-green","color-orange","color-purple","color-pink"];
-const neonTextClasses = [
-  "neon-text-1","neon-text-2","neon-text-3","neon-text-4",
-  "neon-text-5","neon-text-6","neon-text-7","neon-text-8"
-];
-const neonBgClasses = [
-  "neon-bg-1","neon-bg-2","neon-bg-3","neon-bg-4",
-  "neon-bg-5","neon-bg-6","neon-bg-7","neon-bg-8"
-];
+const kidColors = ["red","blue","green","orange","purple","pink","teal","yellow"];
+const neonTextClasses = kidColors.map(c=>`neon-text-${c}`);
+const neonBgClasses = kidColors.map(c=>`neon-bg-${c}`);
 
 const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
 const randInt = max => Math.floor(Math.random() * max);
+
+/* --- Word colors: avoid neighbors --- */
+function assignWordColors(words){
+  const assigned = [];
+  for(let i=0; i<words.length; i++){
+    let idx;
+    do { idx = randInt(neonTextClasses.length); }
+    while(i > 0 && idx === assigned[i-1].idx);
+    assigned.push({ word: words[i], textClass: neonTextClasses[idx], bgClass: neonBgClasses[idx], idx });
+  }
+  const colorMap = {};
+  assigned.forEach(a=>{ colorMap[a.word]={textClass:a.textClass,bgClass:a.bgClass}; });
+  return colorMap;
+}
 
 const words = {
   mammals: {
