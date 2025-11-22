@@ -57,14 +57,17 @@ h1 {
   border-radius: 10px;
   box-shadow: 0 6px 30px rgba(0,0,0,0.5);
   overflow-x: auto;
+  width: min(760px, 98%);
 }
 
+/* grid */
 #grid {
   display: grid;
   gap: 6px;
   padding: 6px;
   touch-action: none;
   -webkit-user-select: none;
+  justify-content: center;
 }
 
 /* cells */
@@ -90,7 +93,7 @@ h1 {
 /* temporary highlight while dragging */
 .cell.temp { background: rgba(255,255,255,0.10); box-shadow: 0 0 12px rgba(255,255,255,0.06); }
 
-/* palette */
+/* palette — used for word chip colors and initial cell text color */
 .color-red { color: #FF4C4C; }
 .color-blue { color: #4C8CFF; }
 .color-green { color: #4CFF72; }
@@ -151,3 +154,30 @@ h1 {
 .instr-panel h2 { margin: 0 0 6px 0; }
 .instr-panel h3 { margin: 8px 0 6px 0; }
 .hidden { display: none; }
+
+/* congrats banner */
+#congratsBanner {
+  display: none;
+  width: min(760px, 92%);
+  margin: 12px 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: #07121a;
+  background: linear-gradient(90deg, #fff1b8, #ffd18a);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  align-self: center;
+  z-index: 2000;
+}
+
+/* visible state */
+#congratsBanner.show { display: block; }
+
+/* small screens tweak */
+@media (max-width: 480px){
+  .controls { gap: 6px; }
+  .cell { width: min(34px, 9vw); height: min(34px, 9vw); font-size: min(16px, 5vw); }
+  #congratsBanner { font-size: 16px; padding: 10px; }
+}
