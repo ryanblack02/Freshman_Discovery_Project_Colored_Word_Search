@@ -63,54 +63,49 @@ function getGridSizeByWords(ws){
   const maxLen = Math.max(...ws.map(w=>w.length));
   return Math.max(12, maxLen + 3);
 }
-function createEmptyGrid(size){
-  return Array.from({length:size}, ()=> Array(size).fill(""));
-}
+function createEmptyGrid(size){ return Array.from({length:size},()=>Array(size).fill("")); }
 function fillEmptySpaces(grid){
-  const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  for(let r=0; r<grid.length; r++){
-    for(let c=0; c<grid.length; c++){
-      if(!grid[r][c]) grid[r][c] = randomChoice(alpha);
-    }
-  }
+  const alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for(let r=0;r<grid.length;r++)
+    for(let c=0;c<grid.length;c++)
+      if(!grid[r][c]) grid[r][c]=randomChoice(alpha);
 }
 
 /* --- Place words --- */
-function placeWord(grid, word){
-  const dirs = [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
-  const size = grid.length;
-  for(let attempt=0; attempt<400; attempt++){
-    const [dr,dc] = randomChoice(dirs);
-    const row = randInt(size), col = randInt(size);
-    const coords = [];
-    let fits = true;
+function placeWord(grid,word){
+  const dirs=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
+  const size=grid.length;
+  for(let attempt=0;attempt<400;attempt++){
+    const [dr,dc]=randomChoice(dirs);
+    const row=randInt(size), col=randInt(size);
+    const coords=[];
+    let fits=true;
     for(let i=0;i<word.length;i++){
-      const r = row + dr*i, c = col + dc*i;
+      const r=row+dr*i,c=col+dc*i;
       if(r<0||r>=size||c<0||c>=size){ fits=false; break; }
-      const cell = grid[r][c];
-      if(cell && cell !== word[i]) { fits=false; break; }
+      const cell=grid[r][c];
+      if(cell && cell!==word[i]){ fits=false; break; }
       coords.push([r,c]);
     }
     if(!fits) continue;
-    coords.forEach(([r,c],i)=> grid[r][c] = word[i]);
+    coords.forEach(([r,c],i)=>grid[r][c]=word[i]);
     return true;
   }
   console.warn("Couldn't place:", word);
   return false;
 }
 
-/* --- Render --- */
+/* --- Rendering --- */
 function renderGridToDOM(grid){
-  const gridEl = document.getElementById("grid");
-  gridEl.innerHTML = "";
-  gridEl.style.gridTemplateColumns = `repeat(${grid.length}, 40px)`;
-  cellElements = [];
+  const gridEl=document.getElementById("grid");
+  gridEl.innerHTML="";
+  gridEl.style.gridTemplateColumns=`repeat(${grid.length}, 40px)`;
+  cellElements=[];
   for(let r=0;r<grid.length;r++){
-    const rowEls = [];
+    const rowEls=[];
     for(let c=0;c<grid.length;c++){
-      const el = document.createElement("div");
-      // give each cell a playful initial text color (not the neon found color)
-      el.className = `cell ${randomChoice(kidColors)}`;
+      const el=document.createElement("div");
+      el.className=`cell ${randomChoice(kidColors)}`;
       el.dataset.row = r;
       el.dataset.col = c;
       el.textContent = grid[r][c];
@@ -122,54 +117,49 @@ function renderGridToDOM(grid){
 }
 
 function renderWordList(ws){
-  const cont = document.getElementById("wordListContainer");
-  cont.innerHTML = "<strong>Words to Find:</strong><br>";
+  const cont=document.getElementById("wordListContainer");
+  cont.innerHTML="<strong>Words to Find:</strong><br>";
   ws.forEach((w,i)=>{
-    const chip = document.createElement("span");
-    chip.className = `word-chip`;
-    // assign chip neon color same as its assigned index
-    const idx = i % neonTextClasses.length;
-    chip.classList.add(neonTextClasses[idx]);
-    chip.textContent = w;
-    chip.dataset.word = w;
+    const chip=document.createElement("span");
+    chip.className=`word-chip ${kidColors[i%kidColors.length]}`;
+    chip.textContent=w;
+    chip.dataset.word=w;
     cont.appendChild(chip);
   });
 }
 
 /* --- Path helpers --- */
 function getPath(r1,c1,r2,c2){
-  const path = [];
-  const dr = Math.sign(r2 - r1), dc = Math.sign(c2 - c1);
-  let r = r1, c = c1;
+  const path=[];
+  const dr=Math.sign(r2-r1), dc=Math.sign(c2-c1);
+  let r=r1,c=c1;
   while(true){
     path.push([r,c]);
-    if(r === r2 && c === c2) break;
-    r += dr; c += dc;
-    if(r<0 || c<0 || r>=currentGrid.length || c>=currentGrid.length) break;
+    if(r===r2 && c===c2) break;
+    r+=dr; c+=dc;
+    if(r<0||c<0||r>=currentGrid.length||c>=currentGrid.length) break;
   }
   return path;
 }
 function getPathWord(r1,c1,r2,c2,grid){
-  const dr = Math.sign(r2 - r1), dc = Math.sign(c2 - c1);
-  if(dr === 0 && dc === 0) return grid[r1][c1];
+  const dr=Math.sign(r2-r1), dc=Math.sign(c2-c1);
+  if(dr===0 && dc===0) return grid[r1][c1];
   let r=r1,c=c1,str="";
   while(true){
-    str += grid[r][c];
+    str+=grid[r][c];
     if(r===r2 && c===c2) break;
     r+=dr; c+=dc;
   }
   return str;
 }
 
-/* --- Temp highlight --- */
+/* --- Temporary highlight --- */
 function clearTemp(){
   document.querySelectorAll(".cell").forEach(cell=>{
     cell.classList.remove("temp");
-    // remove bg neon classes if not permanent
-    Array.from(cell.classList).forEach(c=>{
-      if(c.startsWith("neon-bg-") && !cell.classList.contains("glow")){
-        cell.classList.remove(c);
-      }
+    const toRemove = Array.from(cell.classList).filter(c => c.startsWith("neon-") || c.startsWith("highlight-"));
+    toRemove.forEach(c => {
+      if(!cell.classList.contains("glow")) cell.classList.remove(c);
     });
   });
 }
@@ -179,96 +169,69 @@ function showTemp(r1,c1,r2,c2){
   if(!currentGrid) return;
   const path = getPath(r1,c1,r2,c2);
   if(path.length === 0) return;
+
   let str = "";
   for(const [r,c] of path) str += currentGrid[r][c];
 
-  // check if path matches any chosen word (forward or reversed)
-  let match = null;
+  let matchWord = null;
   for(const w of chosenWords){
-    const rev = w.split("").reverse().join("");
-    if(w === str || rev === str){ match = w; break; }
-  }
-  if(!match) {
-    // just show temp background for selection
-    for(const [r,c] of path){
-      const el = cellElements[r][c];
-      if(!el) continue;
-      el.classList.add("temp");
-    }
-    return;
+    if(w === str || w.split("").reverse().join("") === w) { matchWord = w; break; }
   }
 
-  // show the matching word's bg class
-  const info = chosenWordColors[match];
-  const bg = info?.bgClass;
+  const info = matchWord ? chosenWordColors[matchWord] : null;
+
   for(const [r,c] of path){
     const el = cellElements[r][c];
     if(!el) continue;
     el.classList.add("temp");
-    if(bg && !el.classList.contains("glow")) el.classList.add(bg);
+    if(info && !el.classList.contains("glow")){
+      el.classList.add(info.bgClass);
+      el.classList.add(info.textClass);
+    }
   }
 }
 
-/* --- Mark found --- */
+/* --- Mark found word --- */
 function markWordFound(word,r1,c1,r2,c2){
-  if(foundSet.has(word)) return;
   const info = chosenWordColors[word];
-  const textCls = info?.textClass;
-  const bgCls = info?.bgClass;
   const path = getPath(r1,c1,r2,c2);
   for(const [r,c] of path){
     const el = cellElements[r][c];
     if(!el) continue;
-    if(bgCls) el.classList.add(bgCls);
-    if(textCls) el.classList.add(textCls);
-    el.classList.add("glow");
+    el.classList.add(info.bgClass, info.textClass, "glow");
     el.classList.remove("temp");
   }
-
   document.querySelectorAll(".word-chip").forEach(ch=>{
     if(ch.dataset.word === word) ch.classList.add("marked");
   });
-
   foundSet.add(word);
   if(foundSet.size === chosenWords.length) showCongratulations();
 }
 
-/* --- Congrats & confetti --- */
+/* --- Congrats + confetti --- */
 function showCongratulations(){
-  const banner = document.getElementById("congratsBanner");
-  if(!banner) return;
-  // show banner (remains until user generates a new grid)
-  banner.classList.remove("hidden");
+  const old = document.getElementById("congratsMessage");
+  if(old) old.remove();
 
-  // confetti
-  try {
-    confetti({ particleCount: 160, spread: 110, origin: { y: 0.35 } });
-    // small stream
-    const end = Date.now() + 900;
-    (function frame(){
-      confetti({ particleCount: 6, spread: 60, origin: { x: Math.random(), y: Math.random() * 0.6 + 0.2 }});
-      if(Date.now() < end) requestAnimationFrame(frame);
-    })();
-  } catch(e){
-    console.warn("confetti not available", e);
-  }
-}
+  const msg = document.createElement("div");
+  msg.id = "congratsMessage";
+  msg.style = "font-size:24px;color:#fff;text-align:center;margin:12px;";
+  msg.textContent = "🎉 Congratulations! You found all words!";
+  document.body.insertBefore(msg, document.getElementById("boardWrap"));
 
-function removeCongratsBanner(){
-  const b = document.getElementById("congratsBanner");
-  if(!b) return;
-  b.classList.add("hidden");
+  // Confetti
+  if(window.confetti) confetti({ particleCount: 150, spread: 70, origin: {y:0.6} });
 }
 
 /* --- DOM hit detection --- */
-function getCellFromPoint(x,y){
-  const el = document.elementFromPoint(x,y);
+function getCellFromPoint(x, y){
+  const el = document.elementFromPoint(x, y);
   if(!el) return null;
   let node = el;
   while(node && node !== document.body){
     if(node.classList && node.classList.contains("cell")){
-      const r = parseInt(node.dataset.row,10);
-      const c = parseInt(node.dataset.col,10);
+      const r = parseInt(node.dataset.row, 10);
+      const c = parseInt(node.dataset.col, 10);
       if(Number.isFinite(r) && Number.isFinite(c)) return [r,c];
       return null;
     }
@@ -279,35 +242,33 @@ function getCellFromPoint(x,y){
 
 /* --- Interaction handlers --- */
 function initInteractionHandlers(){
-  const gridEl = document.getElementById("grid");
+  const gridContainer = document.getElementById("grid");
 
   function getPointer(e){ return e.touches ? e.touches[0] : e; }
 
   function down(e){
     if(!currentGrid) return;
-    if(e.touches) e.preventDefault?.();
+    if(e.targetTouches) e.preventDefault?.();
     isPointerDown = true;
-    const p = getPointer(e);
-    pointerStart = getCellFromPoint(p.clientX, p.clientY);
+    pointerStart = getCellFromPoint(getPointer(e).clientX,getPointer(e).clientY);
     pointerLast = pointerStart;
-    if(pointerStart) showTemp(pointerStart[0], pointerStart[1], pointerStart[0], pointerStart[1]);
+    if(pointerStart) showTemp(pointerStart[0],pointerStart[1],pointerStart[0],pointerStart[1]);
   }
 
   function move(e){
     if(!isPointerDown || !currentGrid) return;
-    const p = getPointer(e);
-    const c = getCellFromPoint(p.clientX, p.clientY);
+    const c = getCellFromPoint(getPointer(e).clientX,getPointer(e).clientY);
     if(!c || !pointerStart) return;
-    if(pointerLast && pointerLast[0] === c[0] && pointerLast[1] === c[1]) return;
+    if(pointerLast && pointerLast[0]===c[0] && pointerLast[1]===c[1]) return;
     pointerLast = c;
-    showTemp(pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1]);
+    showTemp(pointerStart[0],pointerStart[1],pointerLast[0],pointerLast[1]);
   }
 
-  function up(){
+  function up(e){
     if(!isPointerDown || !currentGrid) return;
     isPointerDown = false;
     if(pointerStart && pointerLast){
-      const w = getPathWord(pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1], currentGrid);
+      let w = getPathWord(pointerStart[0],pointerStart[1],pointerLast[0],pointerLast[1],currentGrid);
       const rev = w.split("").reverse().join("");
       if(chosenWords.includes(w)) markWordFound(w, pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1]);
       else if(chosenWords.includes(rev)) markWordFound(rev, pointerStart[0], pointerStart[1], pointerLast[0], pointerLast[1]);
@@ -316,44 +277,42 @@ function initInteractionHandlers(){
     pointerStart = null; pointerLast = null;
   }
 
-  gridEl.addEventListener("mousedown", down);
-  gridEl.addEventListener("touchstart", down, { passive: false });
+  gridContainer.addEventListener("mousedown", down);
+  gridContainer.addEventListener("touchstart", down, { passive:false });
   window.addEventListener("mousemove", move);
-  window.addEventListener("touchmove", move, { passive: false });
+  window.addEventListener("touchmove", move, { passive:false });
   window.addEventListener("mouseup", up);
   window.addEventListener("touchend", up);
 }
 
 /* --- Generate puzzle --- */
 function generateWordSearch(){
-  // remove banner immediately
-  removeCongratsBanner();
-
-  foundSet = new Set();
-  chosenWords = [];
-  chosenWordColors = {};
-  clearTemp();
+  const oldMsg = document.getElementById("congratsMessage");
+  if(oldMsg) oldMsg.remove();
+  foundSet = new Set(); chosenWords = []; chosenWordColors = {}; clearTemp();
 
   const cat = document.getElementById("categoryDropdown").value || "mammals";
   const diff = document.getElementById("difficultyDropdown").value || "kid";
   let pool = (words[cat] && words[cat][diff]) ? words[cat][diff].slice() : [];
   pool = pool.map(w => w.toUpperCase());
 
-  // pick 6 words
-  chosenWords = pool.sort(()=>0.5 - Math.random()).slice(0,6);
+  // Choose 6 words
+  chosenWords = pool.sort(()=>0.5 - Math.random()).slice(0, 6);
 
-  // assign neon classes per word
-  chosenWords.forEach((w,i)=>{
-    const idx = i % neonTextClasses.length;
+  // Assign colors avoiding neighboring duplicates
+  let usedIndexes = [];
+  chosenWords.forEach((w, i)=>{
+    let idx;
+    do { idx = randInt(neonTextClasses.length); } while(usedIndexes.includes(idx));
+    usedIndexes.push(idx);
     chosenWordColors[w] = {
-      textClass: neonTextClasses[idx],
-      bgClass: neonBgClasses[idx]
+      textClass: neonTextClasses[idx % neonTextClasses.length],
+      bgClass: neonBgClasses[idx % neonBgClasses.length]
     };
   });
 
   const size = getGridSizeByWords(chosenWords);
   const grid = createEmptyGrid(size);
-
   chosenWords.forEach(w => placeWord(grid, w));
   fillEmptySpaces(grid);
 
@@ -368,10 +327,17 @@ function initInstructionsToggle(){
   const btn = document.getElementById("instrToggle");
   const panel = document.getElementById("instructionsPanel");
   btn.addEventListener("click", ()=>{
-    const isHidden = panel.classList.toggle("hidden");
-    btn.setAttribute("aria-expanded", (!isHidden).toString());
-    panel.setAttribute("aria-hidden", isHidden.toString());
-    if(!isHidden) panel.scrollIntoView({behavior:"smooth", block:"center"});
+    const isOpen = !panel.classList.contains("hidden");
+    if(isOpen){
+      panel.classList.add("hidden");
+      btn.setAttribute("aria-expanded","false");
+      panel.setAttribute("aria-hidden","true");
+    } else {
+      panel.classList.remove("hidden");
+      btn.setAttribute("aria-expanded","true");
+      panel.setAttribute("aria-hidden","false");
+      panel.scrollIntoView({behavior:"smooth", block:"center"});
+    }
   });
 }
 
@@ -379,10 +345,7 @@ function initInstructionsToggle(){
 window.addEventListener("load", ()=>{
   initInteractionHandlers();
   initInstructionsToggle();
-
   const genBtn = document.getElementById("generateButton");
-  genBtn.addEventListener("click", generateWordSearch);
-
-  // initial grid
-  generateWordSearch();
+  if(genBtn) genBtn.onclick = generateWordSearch;
+  generateWordSearch(); // starter grid
 });
