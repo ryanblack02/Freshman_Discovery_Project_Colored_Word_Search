@@ -218,20 +218,46 @@ function markWordFound(word,r1,c1,r2,c2){
   if(foundSet.size === chosenWords.length) showCongratulations();
 }
 
-/* --- Congrats + confetti --- */
-function showCongratulations(){
+function showCongratulations() {
+  // Remove old banner if it exists
   const old = document.getElementById("congratsMessage");
-  if(old) old.remove();
+  if (old) old.remove();
 
+  // Create new banner
   const msg = document.createElement("div");
   msg.id = "congratsMessage";
-  msg.style = "font-size:24px;color:#fff;text-align:center;margin:12px;";
   msg.textContent = "🎉 Congratulations! You found all words!";
-  document.body.insertBefore(msg, document.getElementById("boardWrap"));
 
-  // Confetti
-  if(window.confetti) confetti({ particleCount: 150, spread: 70, origin: {y:0.6} });
+  // Add neon style (you can pick a color randomly from your palette)
+  const neonColors = ["red", "blue", "green", "orange", "purple", "pink", "teal", "yellow"];
+  const color = neonColors[Math.floor(Math.random() * neonColors.length)];
+  msg.classList.add(`neon-text-${color}`);
+
+  // Optional: add background glow
+  msg.classList.add(`neon-bg-${color}`);
+
+  // Style it for layout
+  msg.style.fontSize = "24px";
+  msg.style.textAlign = "center";
+  msg.style.margin = "12px 0";
+  msg.style.padding = "6px 12px";
+  msg.style.borderRadius = "8px";
+
+  // Insert banner above the board
+  const boardWrap = document.getElementById("boardWrap");
+  if (boardWrap) document.body.insertBefore(msg, boardWrap);
+  else document.body.appendChild(msg);
+
+  // Trigger confetti if available
+  if (window.confetti) {
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }
 }
+
 
 /* --- DOM hit detection --- */
 function getCellFromPoint(x, y){
