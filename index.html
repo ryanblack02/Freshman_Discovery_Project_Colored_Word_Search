@@ -12,7 +12,12 @@
     <p id="categoryLabel">Category: mammals | Difficulty: kid</p>
   </header>
 
+  <!-- WORD LIST MOVED TO THE TOP -->
   <main>
+    <section id="wordListContainer" aria-live="polite">
+      <strong>Words to Find:</strong><br />
+    </section>
+
     <section class="controls">
       <label for="categoryDropdown">Choose a category:</label>
       <select id="categoryDropdown">
@@ -49,10 +54,6 @@
     <!-- congrats banner is injected here (before boardWrap) via JS -->
     <section id="boardWrap">
       <div id="grid" role="grid" aria-label="Word search grid"></div>
-    </section>
-
-    <section id="wordListContainer" aria-live="polite">
-      <strong>Words to Find:</strong><br />
     </section>
   </main>
 
