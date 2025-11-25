@@ -7,19 +7,23 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <header>
     <h1>Animal Word Search</h1>
     <p id="categoryLabel">Category: mammals | Difficulty: kid</p>
   </header>
 
-  <!-- WORD LIST MOVED TO THE TOP -->
   <main>
+
+    <!-- WORD LIST AT TOP -->
     <section id="wordListContainer" aria-live="polite">
-      <strong>Words to Find:</strong><br />
+      <strong style="font-size: 16px;">Words to Find:</strong><br />
+      <!-- JS will insert <span class="word-chip color-red">TIGER</span> etc. -->
     </section>
 
+    <!-- CONTROLS -->
     <section class="controls">
-      <label for="categoryDropdown">Choose a category:</label>
+      <label for="categoryDropdown">Category:</label>
       <select id="categoryDropdown">
         <option value="mammals">Mammals</option>
         <option value="birds">Birds</option>
@@ -30,7 +34,7 @@
         <option value="invertebrates">Invertebrates</option>
       </select>
 
-      <label for="difficultyDropdown">Choose a difficulty:</label>
+      <label for="difficultyDropdown">Difficulty:</label>
       <select id="difficultyDropdown">
         <option value="kid">Kid</option>
         <option value="adult">Adult</option>
@@ -40,29 +44,39 @@
       <button id="instrToggle" aria-expanded="false" class="instr-toggle">Instructions</button>
     </section>
 
+    <!-- INSTRUCTIONS -->
     <section id="instructionsPanel" class="instr-panel hidden" aria-hidden="true">
       <h2>How to Play</h2>
       <ul>
-        <li>Click or tap a letter to begin selecting a word.</li>
-        <li>Drag across letters in any direction: horizontal, vertical, diagonal, and backwards.</li>
-        <li>Release to check whether the selected letters form a word from the list.</li>
-        <li>Found words will lock in and glow with color; they will also be crossed off the list.</li>
+        <li>Tap or click a letter to begin selecting.</li>
+        <li>Drag across letters in any direction—horizontal, vertical, diagonal, backwards.</li>
+        <li>Release to check if your selection matches a word.</li>
+        <li>Correct words lock in with a neon glow and get crossed off your list.</li>
       </ul>
-      <p>The highlight trail shows what you’re selecting while you drag. Have fun!</p>
+      <p>The glowing trail shows what you're selecting as you drag. Have fun!</p>
     </section>
 
-    <!-- congrats banner is injected here (before boardWrap) via JS -->
+    <!-- CONGRATS BANNER (Inserted / toggled by JS) -->
+    <div id="congratsBanner"></div>
+
+    <!-- GRID WRAPPER -->
     <section id="boardWrap">
-      <div id="grid" role="grid" aria-label="Word search grid"></div>
+      <div id="grid" role="grid" aria-label="Word search grid">
+        <!-- JS will insert cells:
+             <div class="cell color-blue">A</div>
+        -->
+      </div>
     </section>
+
   </main>
 
   <footer>
     <p>&copy; 2025 Animal Word Search</p>
   </footer>
 
-  <!-- Canvas Confetti (CDN) -->
+  <!-- Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
   <script src="script.js"></script>
+
 </body>
 </html>
