@@ -1,112 +1,56 @@
-/* Animal Word Search — script.js
-   Advanced Engine (Option B)
-   - 8-direction word placement (including backwards)
-   - Drag selection with live highlight trail (mouse + touch)
-   - Neon color highlights for found words
-   - Confetti on completion and persistent congrats banner until next generate
-   - Uses category + difficulty dropdowns from index.html
-*/
+/* Animal Word Search — Safe & Optimized script.js */
 
 const words = {
   mammals: {
-    kid: [
-      "dog","cat","cow","horse","pig","goat","sheep","bear","lion","tiger",
-      "zebra","panda","mouse","rat","bat","moose","otter","deer","fox","wolf"
-    ],
-    adult: [
-      "okapi","quoll","civet","pudu","takin","saiga","genet","dhole","kudu","tarsier",
-      "margay","xerus","manul","drill","eland","oryx","gerenuk","vicuña","hares","olema"
-    ]
+    kid: ["dog","cat","cow","horse","pig","goat","sheep","bear","lion","tiger","zebra","panda","mouse","rat","bat","moose","otter","deer","fox","wolf"],
+    adult: ["okapi","quoll","civet","pudu","takin","saiga","genet","dhole","kudu","tarsier","margay","xerus","manul","drill","eland","oryx","gerenuk","vicuña","hares","olema"]
   },
-
   birds: {
-    kid: [
-      "owl","duck","swan","eagle","crow","robin","sparrow","pigeon","dove","finch",
-      "heron","crane","parrot","goose","hawk","loon","stork","wren","tern","ibis"
-    ],
-    adult: [
-      "bustard","bittern","curlew","godwit","kestrel","harrier","oriole","skua","gannet","petrel",
-      "lapwing","magpie","redstart","pipit","warbler","siskin","shrike","vireo","wryneck","tanager"
-    ]
+    kid: ["owl","duck","swan","eagle","crow","robin","sparrow","pigeon","dove","finch","heron","crane","parrot","goose","hawk","loon","stork","wren","tern","ibis"],
+    adult: ["bustard","bittern","curlew","godwit","kestrel","harrier","oriole","skua","gannet","petrel","lapwing","magpie","redstart","pipit","warbler","siskin","shrike","vireo","wryneck","tanager"]
   },
-
   reptiles: {
-    kid: [
-      "snake","lizard","gecko","turtle","tortoise","iguana","skink","cobra","python","viper",
-      "chameleon","gator","croc","anole","boa","mamba","adder","terrapin","monitor","krait"
-    ],
-    adult: [
-      "agamid","basilisk","daygecko","glassfrog","caiman","gavial","iguanid","anaconda","bushviper","coralsnake",
-      "kingsnake","whipsnake","watersnake","wormsnake","brownanole","mudsnake","taipan","girdled","savanna","cantil"
-    ]
+    kid: ["snake","lizard","gecko","turtle","tortoise","iguana","skink","cobra","python","viper","chameleon","gator","croc","anole","boa","mamba","adder","terrapin","monitor","krait"],
+    adult: ["agamid","basilisk","daygecko","glassfrog","caiman","gavial","iguanid","anaconda","bushviper","coralsnake","kingsnake","whipsnake","watersnake","wormsnake","brownanole","mudsnake","taipan","girdled","savanna","cantil"]
   },
-
   amphibians: {
-    kid: [
-      "frog","toad","newt","salamander","tadpole","axolotl","treefrog","bullfrog","mudpuppy","eft",
-      "spadefoot","peeper","glassfrog","ribbit","pickerel","coqui","springfrog","redback","toadlet","marshfrog"
-    ],
-    adult: [
-      "olm","sirens","caecilian","hellbender","mantella","darwinfrog","natterjack","firebelly","spadefoot","duskynewt",
-      "moorfrog","crestednewt","roughskinned","reedfrog","leaffrog","torrentfrog","riverfrog","brooknewt","puddletoad","palmfrog"
-    ]
+    kid: ["frog","toad","newt","salamander","tadpole","axolotl","treefrog","bullfrog","mudpuppy","eft","spadefoot","peeper","glassfrog","ribbit","pickerel","coqui","springfrog","redback","toadlet","marshfrog"],
+    adult: ["olm","sirens","caecilian","hellbender","mantella","darwinfrog","natterjack","firebelly","spadefoot","duskynewt","moorfrog","crestednewt","roughskinned","reedfrog","leaffrog","torrentfrog","riverfrog","brooknewt","puddletoad","palmfrog"]
   },
-
   fish: {
-    kid: [
-      "shark","tuna","trout","salmon","cod","bass","perch","guppy","carp","minnow",
-      "catfish","eel","pike","sturgeon","snapper","halibut","manta","ray","flounder","dory"
-    ],
-    adult: [
-      "tarpon","pollock","herring","mackerel","wahoo","lamprey","moray","sculpin","skate","char",
-      "wrasse","tilapia","sardine","anchovy","bonefish","snapper","arowana","grouper","parrotfish","trigger"
-    ]
+    kid: ["shark","tuna","trout","salmon","cod","bass","perch","guppy","carp","minnow","catfish","eel","pike","sturgeon","snapper","halibut","manta","ray","flounder","dory"],
+    adult: ["tarpon","pollock","herring","mackerel","wahoo","lamprey","moray","sculpin","skate","char","wrasse","tilapia","sardine","anchovy","bonefish","snapper","arowana","grouper","parrotfish","trigger"]
   },
-
   insects: {
-    kid: [
-      "ant","bee","fly","wasp","moth","bug","roach","beetle","spider","caterpillar",
-      "cricket","dragonfly","ladybug","firefly","weevil","earwig","mayfly","mantis","locust","termite"
-    ],
-    adult: [
-      "aphid","katydid","caddis","dobson","thrips","ichneumon","fritfly","leafhopper","stonefly","tigerbeetle",
-      "sawfly","whirligig","greenfly","hornet","gnat","fruitfly","sandfly","stinkbug","damsel","silverfish"
-    ]
+    kid: ["ant","bee","fly","wasp","moth","bug","roach","beetle","spider","caterpillar","cricket","dragonfly","ladybug","firefly","weevil","earwig","mayfly","mantis","locust","termite"],
+    adult: ["aphid","katydid","caddis","dobson","thrips","ichneumon","fritfly","leafhopper","stonefly","tigerbeetle","sawfly","whirligig","greenfly","hornet","gnat","fruitfly","sandfly","stinkbug","damsel","silverfish"]
   },
-
   invertebrates: {
-    kid: [
-      "snail","slug","worm","crab","lobster","octopus","squid","clam","shrimp","urchin",
-      "jelly","anemone","sponge","starfish","coral","barnacle","mussel","scallop","krill","isopod"
-    ],
-    adult: [
-      "nudibranch","limpet","whelk","copepod","isopod","cuttle","mantis","krill","polychaete","hydra",
-      "seafoam","tunicate","bryozoan","sandworm","lugworm","featherworm","seaangel","seahare","nereis"
-    ]
+    kid: ["snail","slug","worm","crab","lobster","octopus","squid","clam","shrimp","urchin","jelly","anemone","sponge","starfish","coral","barnacle","mussel","scallop","krill","isopod"],
+    adult: ["nudibranch","limpet","whelk","copepod","cuttle","mantis","krill","polychaete","hydra","seafoam","tunicate","bryozoan","sandworm","lugworm","featherworm","seaangel","seahare","nereis"]
   }
 };
 
-
-/* -------------------- CONFIG & PALETTE -------------------- */
-const MIN_GRID = 12;
+/* --- Config & Helpers --- */
+const MIN_GRID = 15;
 const kidColors = ["color-red","color-blue","color-green","color-orange","color-purple","color-pink"];
 const neonNames = ["red","blue","green","orange","purple","pink"];
 const neonClassForIndex = i => `highlight-${neonNames[i % neonNames.length]}`;
 const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
 const randInt = max => Math.floor(Math.random() * max);
+const normalizeWord = w => w.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 
-/* -------------------- STATE -------------------- */
+/* --- State --- */
 let currentGrid = null;
-let cellElements = [];               // 2D array of DOM nodes [row][col]
-let chosenWords = [];                // UPPERCASE words
-let chosenWordColors = {};           // word -> { highlightClass }
+let cellElements = [];
+let chosenWords = [];
+let chosenWordColors = {};
 let foundSet = new Set();
-
 let isPointerDown = false;
 let pointerStart = null;
 let pointerLast = null;
 
-/* -------------------- Grid helpers -------------------- */
+/* --- Grid helpers --- */
 function getGridSizeByWords(ws){
   const maxLen = Math.max(...ws.map(w=>w.length));
   return Math.max(MIN_GRID, maxLen + 3);
@@ -125,42 +69,42 @@ function fillEmptySpaces(grid){
   }
 }
 
-/* -------------------- Place words into grid -------------------- */
+/* --- Place words --- */
 function placeWord(grid, word){
   const dirs = [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
   const size = grid.length;
-  for(let attempt=0; attempt<400; attempt++){
+  const maxAttempts = 200;
+  for(let attempt=0; attempt<maxAttempts; attempt++){
     const [dr,dc] = randomChoice(dirs);
     const row = randInt(size), col = randInt(size);
     const coords = [];
     let fits = true;
     for(let i=0;i<word.length;i++){
-      const r = row + dr*i, c = col + dc*i;
-      if(r<0||r>=size||c<0||c>=size){ fits=false; break; }
+      const r=row+dr*i, c=col+dc*i;
+      if(r<0||c<0||r>=size||c>=size){ fits=false; break; }
       const cell = grid[r][c];
       if(cell && cell !== word[i]) { fits=false; break; }
       coords.push([r,c]);
     }
-    if(!fits) continue;
-    coords.forEach(([r,c],i)=> grid[r][c] = word[i]);
-    return true;
+    if(fits){
+      coords.forEach(([r,c],i)=> grid[r][c]=word[i]);
+      return true;
+    }
   }
-  // couldn't place
+  console.warn("Failed placing", word);
   return false;
 }
 
 function placeAllWords(grid){
   for(const w of chosenWords){
-    const ok = placeWord(grid,w);
-    if(!ok) console.warn('Failed placing', w);
+    placeWord(grid,w);
   }
 }
 
-/* -------------------- Rendering -------------------- */
+/* --- Rendering --- */
 function renderGridToDOM(grid){
   const gridEl = document.getElementById("grid");
   gridEl.innerHTML = "";
-  gridEl.style.gridTemplateColumns = `repeat(${grid.length}, 40px)`;
   cellElements = [];
   for(let r=0;r<grid.length;r++){
     const rowEls = [];
@@ -175,6 +119,7 @@ function renderGridToDOM(grid){
     }
     cellElements.push(rowEls);
   }
+  gridEl.style.gridTemplateColumns = `repeat(${grid.length}, min(40px,7vw))`;
 }
 
 function renderWordList(ws){
@@ -189,12 +134,13 @@ function renderWordList(ws){
   });
 }
 
-/* -------------------- Path helpers -------------------- */
+/* --- Path helpers --- */
 function getPath(r1,c1,r2,c2){
   const path = [];
   const dr = Math.sign(r2 - r1), dc = Math.sign(c2 - c1);
   let r=r1, c=c1;
   while(true){
+    if(r<0||c<0||r>=cellElements.length||c>=cellElements[0].length) break;
     path.push([r,c]);
     if(r===r2 && c===c2) break;
     r+=dr; c+=dc;
@@ -203,24 +149,18 @@ function getPath(r1,c1,r2,c2){
 }
 
 function getPathWord(r1,c1,r2,c2,grid){
-  const dr = Math.sign(r2 - r1), dc = Math.sign(c2 - c1);
-  let r=r1, c=c1, str="";
-  while(true){
-    str += grid[r][c];
-    if(r===r2 && c===c2) break;
-    r+=dr; c+=dc;
-  }
+  const path = getPath(r1,c1,r2,c2);
+  let str = "";
+  for(const [r,c] of path) str += grid[r][c];
   return str;
 }
 
-/* -------------------- Temporary highlight -------------------- */
+/* --- Temp highlight --- */
 function clearTemp(){
   document.querySelectorAll(".cell").forEach(cell=>{
     cell.classList.remove("temp");
     Array.from(cell.classList).forEach(c=>{
-      if(c.startsWith("highlight-") && !cell.classList.contains("glow")){
-        cell.classList.remove(c);
-      }
+      if(c.startsWith("highlight-") && !cell.classList.contains("glow")) cell.classList.remove(c);
     });
   });
 }
@@ -246,7 +186,7 @@ function showTemp(r1,c1,r2,c2){
   }
 }
 
-/* -------------------- Mark found word -------------------- */
+/* --- Mark word found --- */
 function markWordFound(word,r1,c1,r2,c2){
   if(foundSet.has(word)) return;
   const info = chosenWordColors[word];
@@ -266,32 +206,30 @@ function markWordFound(word,r1,c1,r2,c2){
   if(foundSet.size===chosenWords.length) showCongratulations();
 }
 
-/* -------------------- Congratulations + confetti -------------------- */
+/* --- Congrats + confetti --- */
 function showCongratulations(){
-  if(document.getElementById("congratsBanner")) return;
-  const banner = document.createElement("div");
-  banner.id="congratsBanner";
-  banner.className="show";
+  const banner = document.getElementById("congratsBanner");
+  if(!banner) return;
   banner.textContent="🎉 Congratulations! You found all the words!";
-  const boardWrap = document.getElementById("boardWrap");
-  boardWrap.parentNode.insertBefore(banner, boardWrap);
+  banner.classList.add("show");
 
   try {
     confetti({particleCount:150, spread:100, origin:{y:0.35}});
-    const end = Date.now()+800;
-    (function frame(){
+    const end = Date.now() + 800;
+    const frame = () => {
       confetti({particleCount:6, spread:60, origin:{x:Math.random(), y:Math.random()*0.6+0.2}});
       if(Date.now()<end) requestAnimationFrame(frame);
-    })();
+    };
+    requestAnimationFrame(frame);
   } catch(e){ console.warn("confetti failed:", e); }
 }
 
 function removeCongratsBanner(){
   const b = document.getElementById("congratsBanner");
-  if(b) b.remove();
+  if(b) b.classList.remove("show");
 }
 
-/* -------------------- DOM hit helper -------------------- */
+/* --- DOM helpers --- */
 function getCellFromPoint(x,y){
   const el = document.elementFromPoint(x,y);
   if(!el) return null;
@@ -308,7 +246,7 @@ function getCellFromPoint(x,y){
   return null;
 }
 
-/* -------------------- Interaction handlers -------------------- */
+/* --- Interaction handlers --- */
 function initInteractionHandlers(){
   const gridEl = document.getElementById("grid");
   const getPointer = e => e.touches ? e.touches[0] : e;
@@ -353,7 +291,7 @@ function initInteractionHandlers(){
   window.addEventListener("touchend", up);
 }
 
-/* -------------------- Generate puzzle -------------------- */
+/* --- Generate puzzle --- */
 function generateWordSearch(){
   removeCongratsBanner();
   foundSet = new Set();
@@ -364,9 +302,10 @@ function generateWordSearch(){
   const cat = document.getElementById("categoryDropdown").value || "mammals";
   const diff = document.getElementById("difficultyDropdown").value || "kid";
   let pool = (words[cat] && words[cat][diff]) ? words[cat][diff].slice() : [];
-  pool = pool.map(w=>w.toUpperCase());
+  pool = pool.map(normalizeWord);
+  pool = [...new Set(pool)]; // remove duplicates
 
-  chosenWords = pool.sort(()=>0.5 - Math.random()).slice(0,6);
+  chosenWords = pool.sort(()=>0.5-Math.random()).slice(0,6);
   chosenWords.forEach((w,i)=> chosenWordColors[w]={highlightClass: neonClassForIndex(i)});
 
   const size = getGridSizeByWords(chosenWords);
@@ -380,7 +319,7 @@ function generateWordSearch(){
   document.getElementById("categoryLabel").textContent=`Category: ${cat} | Difficulty: ${diff}`;
 }
 
-/* -------------------- Instructions toggle -------------------- */
+/* --- Instructions toggle --- */
 function initInstructionsToggle(){
   const btn = document.getElementById("instrToggle");
   const panel = document.getElementById("instructionsPanel");
@@ -392,7 +331,7 @@ function initInstructionsToggle(){
   });
 }
 
-/* -------------------- Init -------------------- */
+/* --- Init --- */
 window.addEventListener("load", ()=>{
   initInteractionHandlers();
   initInstructionsToggle();
