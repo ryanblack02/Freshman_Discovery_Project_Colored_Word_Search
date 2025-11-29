@@ -81,7 +81,7 @@ const words = {
     ],
     adult: [
       "nudibranch","limpet","whelk","copepod","isopod","cuttle","mantis","krill","polychaete","hydra",
-      "seafoam","nudibranch","tunicate","bryozoan","sandworm","lugworm","featherworm","seaangel","seahare","nereis"
+      "seafoam","tunicate","bryozoan","sandworm","lugworm","featherworm","seaangel","seahare","nereis"
     ]
   }
 };
