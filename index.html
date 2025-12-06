@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Animal Word Search</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
   <header>
@@ -15,10 +16,10 @@
 
   <main>
 
-    <!-- WORD LIST AT TOP -->
+    <!-- WORD LIST -->
     <section id="wordListContainer" aria-live="polite">
       <strong style="font-size: 16px;">Words to Find:</strong><br />
-      <!-- JS will insert <span class="word-chip color-red">TIGER</span> etc. -->
+      <!-- JS will insert word chips here -->
     </section>
 
     <!-- CONTROLS -->
@@ -49,28 +50,26 @@
       <h2>How to Play</h2>
       <ul>
         <li>Tap or click a letter to begin selecting.</li>
-        <li>Drag across letters in any direction—horizontal, vertical, diagonal, backwards.</li>
+        <li>Drag across letters in any direction—horizontal, vertical, diagonal, or backwards.</li>
         <li>Release to check if your selection matches a word.</li>
         <li>Correct words lock in with a neon glow and get crossed off your list.</li>
       </ul>
-      <p>The glowing trail shows what you're selecting as you drag. Have fun!</p>
+      <p>The glowing trail shows the letters you are dragging over. Have fun!</p>
     </section>
 
-    <!-- CONGRATS BANNER (Inserted/toggled by JS) -->
+    <!-- CONGRATS BANNER -->
     <div id="congratsBanner"></div>
 
     <!-- GRID WRAPPER -->
     <section id="boardWrap">
       <div id="grid" role="grid" aria-label="Word search grid">
-        <!-- JS will insert cells:
-             <div class="cell color-blue">A</div>
-        -->
+        <!-- JS inserts cells here -->
       </div>
     </section>
 
-    <!-- OPTIONAL MUSIC NOTE -->
+    <!-- OPTIONAL MUSIC REMINDER -->
     <section id="musicNote" style="margin-top: 16px; text-align: center; font-size: 14px; color: #cfe8ff;">
-      🎵 For a relaxing atmosphere while playing, you can play your favorite music separately.
+      🎵 Want a relaxing atmosphere? Feel free to play your own background music while you solve the puzzle.
     </section>
 
   </main>
@@ -79,7 +78,7 @@
     <p>&copy; 2025 Animal Word Search</p>
   </footer>
 
-  <!-- Confetti -->
+  <!-- Confetti Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
   <script src="script.js"></script>
 
