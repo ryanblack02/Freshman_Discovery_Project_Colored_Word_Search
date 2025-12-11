@@ -3,7 +3,7 @@
 const words = {
   mammals: {
     kid: ["dog","cat","cow","horse","pig","goat","sheep","bear","lion","tiger","zebra","panda","mouse","rat","bat","moose","otter","deer","fox","wolf"],
-    adult: ["okapi","quoll","civet","pudu","takin","saiga","genet","dhole","kudu","tarsier","margay","xerus","manul","drill","eland","oryx","gerenuk","vicuña","hares","olema"]
+    adult: ["okapi","quoll","civet","pudu","takin","saiga","genet","dhole","kudu","tarsier","margay","xerus","manul","drill","eland","oryx","gerenuk","vicuña","hares","tule"]
   },
   birds: {
     kid: ["owl","duck","swan","eagle","crow","robin","sparrow","pigeon","dove","finch","heron","crane","parrot","goose","hawk","loon","stork","wren","tern","ibis"],
